@@ -7,11 +7,32 @@ import {
 
 import { LobeRuntimeAI } from '../BaseAI';
 import { AgentRuntimeErrorType } from '../error';
-import { ChatCompetitionOptions, ChatStreamPayload, ModelProvider } from '../types';
+import { ChatCompetitionOptions, ChatStreamPayload, ModelProvider,OpenAIChatMessage } from '../types';
 import { AgentRuntimeError } from '../utils/createError';
 import { debugStream } from '../utils/debugStream';
 import { StreamingResponse } from '../utils/response';
 import { AzureOpenAIStream } from '../utils/streams';
+
+// TODO: 临时写法，后续要重构成 model card 展示配置
+export const o1Models = new Set([
+  'o1-preview',
+  'o1-preview-2024-09-12',
+  'o1-mini',
+  'o1-mini-2024-09-12',
+]);
+
+export const pruneO1Payload = (payload: ChatStreamPayload) => ({
+  ...payload,
+  frequency_penalty: 0,
+  messages: payload.messages.map((message: OpenAIChatMessage) => ({
+    ...message,
+    role: message.role === 'system' ? 'user' : message.role,
+  })),
+  presence_penalty: 0,
+  stream: false,
+  temperature: 1,
+  top_p: 1,
+});
 
 export class LobeAzureOpenAI implements LobeRuntimeAI {
   client: OpenAIClient;
@@ -26,6 +47,7 @@ export class LobeAzureOpenAI implements LobeRuntimeAI {
   }
 
   baseURL: string;
+  
 
   async chat(payload: ChatStreamPayload, options?: ChatCompetitionOptions) {
     // ============  1. preprocess messages   ============ //
@@ -35,6 +57,9 @@ export class LobeAzureOpenAI implements LobeRuntimeAI {
     // ============  2. send api   ============ //
 
     try {
+      if (o1Models.has(model)) {
+        return pruneO1Payload(payload) as any;
+      }
       const response = await this.client.streamChatCompletions(
         model,
         messages as ChatRequestMessage[],
