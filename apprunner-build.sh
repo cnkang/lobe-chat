@@ -37,12 +37,15 @@ fi
 echo "🔧 Setting environment variables..."
 export NODE_ENV=production
 export DOCKER=true
-export NODE_OPTIONS="--max-old-space-size=8192"
+export NODE_OPTIONS="--max-old-space-size=4096 --max-semi-space-size=128"
 export NEXT_TELEMETRY_DISABLED=1
+export NEXT_PUBLIC_ANALYTICS_VERCEL=false
+export NEXT_PUBLIC_ANALYTICS_POSTHOG=false
+export REACT_SCAN_MONITOR_API_KEY=
 
-# Use simple config for App Runner
-echo "🔧 Using simple Next.js configuration..."
-cp next.config.simple.ts next.config.ts
+# Use App Runner specific config
+echo "🔧 Using App Runner Next.js configuration..."
+cp next.config.apprunner.ts next.config.ts
 
 # Run prebuild script
 echo "🔧 Running prebuild script..."
@@ -52,15 +55,33 @@ $BUN_INSTALL/bin/bun run prebuild
 echo "🏗️ Building the application..."
 echo "Node options: $NODE_OPTIONS"
 
-if ! $BUN_INSTALL/bin/bun run build 2>&1 | tee build.log; then
-    echo "❌ Build failed. Showing build log:"
-    echo "=== Last 50 lines ==="
-    tail -50 build.log
-    echo "=== Environment ==="
-    env | grep -E '(NODE|NEXT)'
-    echo "=== Config file ==="
-    head -20 next.config.ts
-    exit 1
+# Debug information before build
+echo "=== Pre-build Debug Info ==="
+echo "Current directory: $(pwd)"
+echo "Node version: $(node --version)"
+echo "Bun version: $($BUN_INSTALL/bin/bun --version)"
+echo "Available memory: $(free -h 2>/dev/null || echo 'N/A')"
+echo "Next.js config file:"
+ls -la next.config.ts
+echo "Environment variables:"
+env | grep -E '(NODE|NEXT|DOCKER)' | sort
+
+# Run build and capture both stdout and stderr
+echo "Starting Next.js build..."
+if $BUN_INSTALL/bin/bun run build:apprunner 2>&1 | tee build.log; then
+    echo "✅ Build completed successfully!"
+else
+    BUILD_EXIT_CODE=$?
+    echo "❌ Build failed with exit code: $BUILD_EXIT_CODE"
+    echo "=== Build Log (Last 200 lines) ==="
+    tail -200 build.log
+    echo "=== Disk Space ==="
+    df -h
+    echo "=== Memory Usage ==="
+    free -h 2>/dev/null || echo 'Memory info not available'
+    echo "=== Next.js Config ==="
+    cat next.config.ts
+    exit $BUILD_EXIT_CODE
 fi
 
 # Verify build output exists
@@ -72,5 +93,3 @@ fi
 # Make the build directory accessible to App Runner
 echo "🔧 Setting permissions for build artifacts..."
 chmod -R 755 .next
-
-echo "✅ Build completed successfully!"
