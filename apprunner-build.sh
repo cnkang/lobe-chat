@@ -7,9 +7,9 @@ set -e # Exit on any error
 
 echo "🚀 Starting AWS App Runner build process..."
 
-# Install required dependencies for bun (curl should be pre-installed)
-echo "📦 Checking for required dependencies..."
-which curl || dnf install -y curl
+# Install required dependencies
+echo "📦 Installing required dependencies..."
+dnf install -y curl findutils || yum install -y curl findutils || apt-get update && apt-get install -y curl findutils || true
 
 # Install bun
 echo "📦 Installing bun..."
@@ -25,14 +25,18 @@ $BUN_INSTALL/bin/bun --version
 echo "📦 Installing dependencies with bun..."
 $BUN_INSTALL/bin/bun install
 
-# Allow postinstalls for App Runner
-echo "🔧 Allowing postinstalls..."
-$BUN_INSTALL/bin/bun pm untrusted --all 2>/dev/null || true
+# Trust dependencies for App Runner
+echo "🔧 Trusting dependencies..."
+$BUN_INSTALL/bin/bun pm trust --all 2>/dev/null || true
 
 # Load App Runner specific environment variables
 echo "🔧 Loading App Runner environment variables..."
 if [ -f .env.apprunner ]; then
-    export $(cat .env.apprunner | grep -v '^#' | xargs)
+    while IFS= read -r line; do
+        if [[ $line != \#* ]] && [[ -n $line ]]; then
+            export "$line"
+        fi
+    done < .env.apprunner
 fi
 
 # Set additional environment variables for App Runner
