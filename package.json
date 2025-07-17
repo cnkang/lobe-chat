@@ -377,5 +377,22 @@
     "overrides": {
       "mdast-util-gfm-autolink-literal": "2.0.0"
     }
-  }
+  },
+  "trustedDependencies": [
+    "@clerk/shared",
+    "@scarf/scarf",
+    "@sentry/cli",
+    "@tree-sitter-grammars/tree-sitter-yaml",
+    "@vercel/speed-insights",
+    "canvas",
+    "core-js",
+    "core-js-pure",
+    "es5-ext",
+    "esbuild",
+    "protobufjs",
+    "sharp",
+    "tree-sitter",
+    "tree-sitter-json",
+    "unrs-resolver"
+  ]
 }
