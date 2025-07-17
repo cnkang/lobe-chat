@@ -42,6 +42,7 @@ export NEXT_TELEMETRY_DISABLED=1
 export NEXT_PUBLIC_ANALYTICS_VERCEL=false
 export NEXT_PUBLIC_ANALYTICS_POSTHOG=false
 export REACT_SCAN_MONITOR_API_KEY=
+export NEXT_PUBLIC_ENABLE_LANGCHAIN_EPUB=false
 
 # Use App Runner specific config
 echo "🔧 Using App Runner Next.js configuration..."
@@ -68,10 +69,12 @@ env | grep -E '(NODE|NEXT|DOCKER)' | sort
 
 # Run build and capture both stdout and stderr
 echo "Starting Next.js build..."
-if $BUN_INSTALL/bin/bun run build:apprunner 2>&1 | tee build.log; then
+$BUN_INSTALL/bin/bun run build:apprunner 2>&1 | tee build.log
+BUILD_EXIT_CODE=${PIPESTATUS[0]}
+
+if [ $BUILD_EXIT_CODE -eq 0 ]; then
     echo "✅ Build completed successfully!"
 else
-    BUILD_EXIT_CODE=$?
     echo "❌ Build failed with exit code: $BUILD_EXIT_CODE"
     echo "=== Build Log (Last 200 lines) ==="
     tail -200 build.log

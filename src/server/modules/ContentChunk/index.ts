@@ -1,4 +1,5 @@
 import { Strategy } from 'unstructured-client/sdk/models/shared';
+import type { Document } from 'langchain/document';
 
 import { knowledgeEnv } from '@/config/knowledge';
 import type { NewChunkItem, NewUnstructuredChunkItem } from '@/database/schemas';
@@ -160,7 +161,7 @@ export class ContentChunk {
   ): Promise<ChunkResult> => {
     const res = await this.langchainClient.partitionContent(filename, content);
 
-    const documents = res.map((item, index) => ({
+    const documents = res.map((item: Document, index: number) => ({
       id: item.id,
       index,
       metadata: item.metadata,

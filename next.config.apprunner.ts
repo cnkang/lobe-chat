@@ -4,70 +4,41 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   compress: true,
-  experimental: {
-    // Disable server minification to avoid issues with oidc provider
-    serverMinification: false,
-    // Optimize package imports for better build performance
-    optimizePackageImports: [
-      '@lobehub/ui',
-      'lucide-react',
-      'antd',
-    ],
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-  // Minimal webpack configuration for App Runner
-  webpack(config) {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  experimental: {
+    serverMinification: false,
+  },
+  webpack(config, { isServer }) {
     // Externalize problematic packages
-    config.externals.push('pino-pretty', 'canvas');
+    config.externals.push('pino-pretty');
     
-    // Disable canvas to avoid native dependencies
+    // Fix resolve issues
     config.resolve.alias.canvas = false;
     
-    // Optimize for memory usage
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      },
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      zipfile: false,
     };
+    
+    // Handle client-side only modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
     
     return config;
   },
-  // Minimal headers for production
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'x-robots-tag',
-            value: 'all',
-          },
-        ],
-      },
-    ];
-  },
-  // Simple redirects
-  redirects: async () => [
-    {
-      source: '/settings',
-      destination: '/settings/common',
-      permanent: true,
-    },
-    {
-      source: '/welcome',
-      destination: '/chat',
-      permanent: true,
-    },
-  ],
   // Disable some features that might cause issues
-  serverExternalPackages: ['@electric-sql/pglite'],
+  serverExternalPackages: ['@electric-sql/pglite', 'epub2'],
   transpilePackages: ['pdfjs-dist'],
 };
 

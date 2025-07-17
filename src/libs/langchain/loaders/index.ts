@@ -9,7 +9,15 @@ import { LangChainLoaderType } from '@/libs/langchain/types';
 import { CodeLoader } from './code';
 import { CsVLoader } from './csv';
 import { DocxLoader } from './docx';
-import { EPubLoader } from './epub';
+// Conditionally import EPubLoader to avoid build issues
+let EPubLoader: any;
+try {
+  EPubLoader = require('./epub').EPubLoader;
+} catch {
+  EPubLoader = async () => {
+    throw new Error('EPUB support is disabled in this build');
+  };
+}
 import { LatexLoader } from './latex';
 import { MarkdownLoader } from './markdown';
 import { PdfLoader } from './pdf';
