@@ -31,6 +31,8 @@
   "scripts": {
     "prebuild": "tsx scripts/prebuild.mts",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 next build",
+    "build:apprunner": "cross-env NODE_OPTIONS=--max-old-space-size=4096 NEXT_TELEMETRY_DISABLED=1 next build",
+    "build:minimal": "cross-env NODE_OPTIONS=--max-old-space-size=4096 NEXT_TELEMETRY_DISABLED=1 DOCKER=true next build",
     "postbuild": "npm run build-sitemap && npm run build-migrate-db",
     "build-migrate-db": "bun run db:migrate",
     "build-sitemap": "tsx ./scripts/buildSitemapIndex/index.ts",

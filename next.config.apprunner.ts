@@ -1,6 +1,6 @@
 import analyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
-import ReactComponentName from 'react-scan/react-component-name/webpack';
+// import ReactComponentName from 'react-scan/react-component-name/webpack';
 
 const isProd = process.env.NODE_ENV === 'production';
 const buildWithDocker = process.env.DOCKER === 'true';
@@ -31,6 +31,8 @@ const nextConfig: NextConfig = {
     ],
     serverMinification: false,
     webVitalsAttribution: ['CLS', 'LCP'],
+    // 减少内存使用
+    esmExternals: 'loose',
   },
   async headers() {
     return [
@@ -60,9 +62,10 @@ const nextConfig: NextConfig = {
       layers: true,
     };
 
-    if (enableReactScan && !isUsePglite) {
-      config.plugins.push(ReactComponentName({}));
-    }
+    // 禁用 React Scan 以减少构建复杂度
+    // if (enableReactScan && !isUsePglite) {
+    //   config.plugins.push(ReactComponentName({}));
+    // }
 
     config.module.rules.push({
       resolve: {
@@ -78,6 +81,28 @@ const nextConfig: NextConfig = {
       ...config.resolve.fallback,
       zipfile: false,
     };
+    
+    // 优化构建性能
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            chunks: 'all',
+          },
+        },
+      },
+    };
+    
     return config;
   },
 };
