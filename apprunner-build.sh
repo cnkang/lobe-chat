@@ -46,9 +46,9 @@ export DOCKER=true
 export NODE_OPTIONS="--max-old-space-size=4096"
 export NEXT_TELEMETRY_DISABLED=1
 
-# Use minimal config for App Runner
-echo "🔧 Using minimal Next.js configuration..."
-cp next.config.minimal.ts next.config.ts
+# Use simple config for App Runner
+echo "🔧 Using simple Next.js configuration..."
+cp next.config.simple.ts next.config.ts
 
 # Run prebuild script
 echo "🔧 Running prebuild script..."
@@ -58,7 +58,7 @@ $BUN_INSTALL/bin/bun run prebuild
 echo "🏗️ Building the application..."
 echo "Node options: $NODE_OPTIONS"
 
-$BUN_INSTALL/bin/bun run build 2>&1 | tee build.log || {
+if ! $BUN_INSTALL/bin/bun run build 2>&1 | tee build.log; then
     echo "❌ Build failed. Showing build log:"
     echo "=== Last 50 lines ==="
     tail -50 build.log
@@ -67,7 +67,13 @@ $BUN_INSTALL/bin/bun run build 2>&1 | tee build.log || {
     echo "=== Config file ==="
     head -20 next.config.ts
     exit 1
-}
+fi
+
+# Verify build output exists
+if [ ! -d ".next" ]; then
+    echo "❌ .next directory not found after build"
+    exit 1
+fi
 
 # Make the build directory accessible to App Runner
 echo "🔧 Setting permissions for build artifacts..."
