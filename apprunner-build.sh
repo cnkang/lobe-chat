@@ -7,9 +7,10 @@ set -e # Exit on any error
 
 echo "🚀 Starting AWS App Runner build process..."
 
-# Install required dependencies
-echo "📦 Installing required dependencies..."
-dnf install -y curl findutils || yum install -y curl findutils || apt-get update && apt-get install -y curl findutils || true
+# Check for required dependencies
+echo "📦 Checking for required dependencies..."
+which curl || echo "curl not found but continuing..."
+which xargs || dnf install -y findutils --allowerasing || yum install -y findutils || true
 
 # Install bun
 echo "📦 Installing bun..."
