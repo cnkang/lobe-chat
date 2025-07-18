@@ -37,7 +37,7 @@ fi
 echo "🔧 Setting environment variables..."
 export NODE_ENV=production
 export DOCKER=true
-export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=128"
+export NODE_OPTIONS="--max-old-space-size=8192"
 export NEXT_TELEMETRY_DISABLED=1
 export NEXT_PUBLIC_ANALYTICS_VERCEL=false
 export NEXT_PUBLIC_ANALYTICS_POSTHOG=false
@@ -69,7 +69,7 @@ env | grep -E '(NODE|NEXT|DOCKER)' | sort
 
 # Run build and capture both stdout and stderr
 echo "Starting Next.js build..."
-$BUN_INSTALL/bin/bun run build:apprunner 2>&1 | tee build.log
+$BUN_INSTALL/bin/bun x next build --debug 2>&1 | tee build.log
 BUILD_EXIT_CODE=${PIPESTATUS[0]}
 
 if [ $BUILD_EXIT_CODE -eq 0 ]; then
