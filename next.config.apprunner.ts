@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverMinification: false,
+    optimizePackageImports: [],
   },
   webpack(config, { isServer }) {
     // Externalize problematic packages
@@ -38,8 +39,13 @@ const nextConfig: NextConfig = {
     return config;
   },
   // Disable some features that might cause issues
-  serverExternalPackages: ['@electric-sql/pglite', 'epub2'],
-  transpilePackages: ['pdfjs-dist'],
+  serverExternalPackages: [
+    '@electric-sql/pglite', 
+    'epub2',
+    'sharp',
+    '@langchain/community',
+    'pdfjs-dist'
+  ],
 };
 
 export default nextConfig;
