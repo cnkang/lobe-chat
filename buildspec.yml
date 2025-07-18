@@ -1,0 +1,22 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - npm install -g bun
+      - bun install
+  pre_build:
+    commands:
+      - bun run lint
+  build:
+    commands:
+      - bun run build
+  post_build:
+    commands:
+      - bun run test || true
+artifacts:
+  files:
+    - '**/*'
+    - '!node_modules/**'
+    - '!.git/**'
