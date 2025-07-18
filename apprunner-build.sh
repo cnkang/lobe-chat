@@ -37,7 +37,7 @@ fi
 echo "🔧 Setting environment variables..."
 export NODE_ENV=production
 export DOCKER=true
-export NODE_OPTIONS="--max-old-space-size=4096 --max-semi-space-size=128"
+export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=128"
 export NEXT_TELEMETRY_DISABLED=1
 export NEXT_PUBLIC_ANALYTICS_VERCEL=false
 export NEXT_PUBLIC_ANALYTICS_POSTHOG=false
