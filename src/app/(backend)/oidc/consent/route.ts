@@ -66,23 +66,25 @@ export async function POST(request: NextRequest) {
 
         // 3. 将用户同意的 scopes 和 claims 添加到 Grant 对象
         //    这些信息通常在 details.prompt.details 中
-        const missingOIDCScope = (prompt.details.missingOIDCScope as string[]) || [];
-        if (missingOIDCScope) {
+        const missingOIDCScope = (prompt.details?.missingOIDCScope as string[]) || [];
+        if (missingOIDCScope && missingOIDCScope.length > 0) {
           grant.addOIDCScope(missingOIDCScope.join(' '));
           log('Added OIDC scopes to grant: %s', missingOIDCScope.join(' '));
         }
-        const missingOIDCClaims = (prompt.details.missingOIDCClaims as string[]) || [];
-        if (missingOIDCClaims) {
+        const missingOIDCClaims = (prompt.details?.missingOIDCClaims as string[]) || [];
+        if (missingOIDCClaims && missingOIDCClaims.length > 0) {
           grant.addOIDCClaims(missingOIDCClaims);
           log('Added OIDC claims to grant: %s', missingOIDCClaims.join(' '));
         }
 
         const missingResourceScopes =
-          (prompt.details.missingResourceScopes as Record<string, string[]>) || {};
-        if (missingResourceScopes) {
+          (prompt.details?.missingResourceScopes as Record<string, string[]>) || {};
+        if (missingResourceScopes && Object.keys(missingResourceScopes).length > 0) {
           for (const [indicator, scopes] of Object.entries(missingResourceScopes)) {
-            grant.addResourceScope(indicator, scopes.join(' '));
-            log('Added resource scopes for %s to grant: %s', indicator, scopes.join(' '));
+            if (scopes && scopes.length > 0) {
+              grant.addResourceScope(indicator, scopes.join(' '));
+              log('Added resource scopes for %s to grant: %s', indicator, scopes.join(' '));
+            }
           }
         }
         // 如果使用了 RAR (Rich Authorization Requests)，也需要添加到 grant

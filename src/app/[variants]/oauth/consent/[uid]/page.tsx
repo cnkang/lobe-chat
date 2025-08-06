@@ -33,8 +33,8 @@ const InteractionPage = async (props: { params: Promise<{ uid: string }> }) => {
     }
 
     // 获取客户端 ID 和授权范围
-    const clientId = (details.params.client_id as string) || 'unknown';
-    const scopes = (details.params.scope as string)?.split(' ') || [];
+    const clientId = (details.params?.client_id as string) || 'unknown';
+    const scopes = (details.params?.scope as string)?.split(' ') || [];
 
     const clientDetail = await oidcService.getClientMetadata(clientId);
 
@@ -51,7 +51,7 @@ const InteractionPage = async (props: { params: Promise<{ uid: string }> }) => {
       <Consent
         clientId={clientId}
         clientMetadata={clientMetadata}
-        redirectUri={details.params.redirect_uri as string}
+        redirectUri={details.params?.redirect_uri as string}
         scopes={scopes}
         uid={params.uid}
       />

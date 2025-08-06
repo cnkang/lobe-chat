@@ -17,8 +17,13 @@ export const getOIDCProvider = async (): Promise<OIDCProvider> => {
       throw new Error('OIDC is not enabled. Set ENABLE_OIDC=1 to enable it.');
     }
 
-    const db = getDBInstance();
-    provider = await createOIDCProvider(db);
+    try {
+      const db = getDBInstance();
+      provider = await createOIDCProvider(db);
+    } catch (error) {
+      console.error('Failed to initialize OIDC provider:', error);
+      throw error;
+    }
   }
 
   return provider;

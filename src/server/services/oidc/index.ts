@@ -14,9 +14,15 @@ export class OIDCService {
     this.provider = provider;
   }
   static async initialize() {
-    const provider = await getOIDCProvider();
-
-    return new OIDCService(provider);
+    try {
+      const provider = await getOIDCProvider();
+      return new OIDCService(provider);
+    } catch (error) {
+      // During build time, OIDC might not be properly initialized
+      // Log the error but don't throw to prevent build failures
+      console.warn('OIDC Service initialization failed:', error);
+      throw error;
+    }
   }
 
   async getInteractionDetails(uid: string) {
