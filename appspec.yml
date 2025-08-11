@@ -1,0 +1,42 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /opt/lobechat
+
+permissions:
+  - object: /opt/lobechat
+    owner: lobechat
+    group: lobechat
+    mode: 755
+    type:
+      - directory
+  - object: /opt/lobechat/*
+    owner: lobechat
+    group: lobechat
+    mode: 644
+    type:
+      - file
+
+hooks:
+  BeforeInstall:
+    - location: deploy/before_install.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: deploy/after_install.sh
+      timeout: 600
+      runas: root
+  ApplicationStart:
+    - location: deploy/start_server.sh
+      timeout: 180
+      runas: root
+  ApplicationStop:
+    - location: deploy/stop_server.sh
+      timeout: 120
+      runas: root
+  ValidateService:
+    - location: deploy/validate.sh
+      timeout: 60
+      runas: root
