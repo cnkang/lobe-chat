@@ -31,7 +31,7 @@ phases:
   build:
     commands:
       - echo "Building with ${THREADS} threads and heap ${HEAP_MB} MB..."
-      - time bun run build
+      - time ./scripts/build.sh
 
 artifacts:
   files:
