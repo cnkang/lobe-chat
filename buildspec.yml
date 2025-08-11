@@ -4,6 +4,7 @@ env:
   variables:
     NEXT_TELEMETRY_DISABLED: "1"
     CI: "1"
+    APP_URL: "https://localhost:3210"
 
 phases:
   install:
