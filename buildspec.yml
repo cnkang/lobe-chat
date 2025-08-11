@@ -23,7 +23,7 @@ phases:
       - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=256"
       - export BUN_JOBS="${THREADS}"
       - export SWC_THREADS="${THREADS}"
-      - echo "Node: $(node -v)  Bun: $(bun --version)  THREADS=${THREADS}  TOTAL_MB=${TOTAL_MB}  HEAP_MB=${HEAP_MB}"
+      - 'echo "Node: $(node -v)  Bun: $(bun --version)  THREADS=${THREADS}  TOTAL_MB=${TOTAL_MB}  HEAP_MB=${HEAP_MB}"'
 
       - echo "Installing dependencies with Bun..."
       - if [ -f bun.lockb ]; then bun install --frozen-lockfile --no-progress; else bun install --no-progress; fi
