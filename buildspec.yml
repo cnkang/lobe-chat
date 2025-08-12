@@ -40,7 +40,7 @@ phases:
       - time ./scripts/build.sh
       - |
         if [ ! -f ".next/standalone/server.js" ]; then
-          echo "ERROR: .next/standalone/server.js not found. Ensure Next.js is configured with \`output: 'standalone'\` in next.config.js." >&2
+          echo "ERROR: .next/standalone/server.js not found. Ensure Next.js is configured with output: 'standalone' in next.config.js." >&2
           echo "next.config.js (if present):" >&2
           [ -f next.config.js ] && sed -n '1,120p' next.config.js >&2 || echo "(next.config.js not found)" >&2
           exit 1
