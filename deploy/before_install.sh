@@ -32,6 +32,9 @@ sudo -u lobechat env HOME="$APP_DIR" NVM_DIR="$NVM_DIR" bash -lc '
   nvm use --lts
   which node; node -v
 '
+echo "export OUTPUT_FILE_TRACING_ROOT=$CODEBUILD_SRC_DIR" >/etc/profile.d/lobechat.sh
+chmod +x /etc/profile.d/lobechat.sh
+
 
 log "==> Write systemd unit (Standalone server.js)"
 cat >/etc/systemd/system/lobechat.service <<'UNIT'
