@@ -31,8 +31,7 @@ chmod 600 .env
 chown -R lobechat:lobechat "$APP_DIR"
 
 # 轻量自检（不装依赖）
-[ -d ".next" ] || echo "WARN: .next missing (consider standalone or check artifacts)"
-[ -d "node_modules" ] || echo "WARN: node_modules missing (should be packaged in CodeBuild)"
+[ -d ".next/standalone" ] || echo "WARN: .next/standalone missing (check artifacts)"
 [ -f "package.json" ] || echo "WARN: package.json missing"
 
 log "after_install.sh done"

@@ -56,16 +56,17 @@ WorkingDirectory=/opt/lobechat
 EnvironmentFile=-/opt/lobechat/.env
 Environment=NVM_DIR=/opt/lobechat/.nvm
 Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PORT=3210
 
 ExecStart=/bin/bash -lc 'set -e; \
   export NVM_DIR=/opt/lobechat/.nvm; \
   [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; \
   nvm install --lts >/dev/null 2>&1 || true; \
   nvm use --lts >/dev/null; \
-  export PATH="$(dirname "$(nvm which --lts)"):$PATH"; \
+  NODE_BIN="$(nvm which --lts)"; \
   cd /opt/lobechat; \
-  echo "Node=$(command -v node) $(node -v)"; \
-  exec node node_modules/next/dist/bin/next start -p 3210'
+  echo "Node=${NODE_BIN} $($NODE_BIN -v)"; \
+  exec "$NODE_BIN" .next/standalone/server.js'
 
 Restart=always
 RestartSec=5

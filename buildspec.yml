@@ -11,8 +11,13 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - echo "Installing Bun..."
-      - curl -fsSL https://bun.sh/install | bash
+      - |
+          if [ ! -x "$HOME/.bun/bin/bun" ]; then
+            echo "Installing Bun..."
+            curl -fsSL https://bun.sh/install | bash
+          else
+            echo "Using cached Bun at $HOME/.bun/bin/bun"
+          fi
       - export BUN_INSTALL="$HOME/.bun"
       - export PATH="$BUN_INSTALL/bin:$PATH"
 
@@ -36,19 +41,18 @@ phases:
 
 artifacts:
   files:
-    - .next/**/*
+    # deliver the standalone bundle, static assets and deployment scripts
+    - .next/standalone/**/*
+    - .next/static/**/*
     - public/**/*
     - package.json
     - bun.lockb
-    - node_modules/**/*
     - appspec.yml
     - deploy/**/*
   discard-paths: no
 
 cache:
   paths:
-    - '/root/.bun/**/*'
     - '~/.bun/**/*'
-    - '~/.cache/bun/**/*'
     - 'node_modules/**/*'
     - '.next/cache/**/*'
