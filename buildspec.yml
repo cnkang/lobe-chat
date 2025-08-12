@@ -2,6 +2,7 @@ version: 0.2
 
 env:
   variables:
+    NODE_ENV: production
     NEXT_TELEMETRY_DISABLED: "1"
     CI: "1"
     APP_URL: "https://localhost:3210"
@@ -11,17 +12,16 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
+      - set -euxo pipefail
       - |
-          if [ ! -x "$HOME/.bun/bin/bun" ]; then
-            echo "Installing Bun..."
-            curl -fsSL https://bun.sh/install | bash
-          else
-            echo "Using cached Bun at $HOME/.bun/bin/bun"
-          fi
+        if [ ! -x "$HOME/.bun/bin/bun" ]; then
+          echo "Installing Bun..."
+          curl -fsSL https://bun.sh/install | bash
+        else
+          echo "Using cached Bun at $HOME/.bun/bin/bun"
+        fi
       - export BUN_INSTALL="$HOME/.bun"
       - export PATH="$BUN_INSTALL/bin:$PATH"
-
-      # 并行与内存：线程 = CPU 核数；堆 = 物理内存 80%，但至少 6144MB
       - export THREADS="$(nproc)"
       - export TOTAL_MB="$(awk '/MemTotal/ {printf "%.0f", $2/1024}' /proc/meminfo)"
       - export HEAP_MB="$(( TOTAL_MB * 80 / 100 ))"
@@ -29,19 +29,27 @@ phases:
       - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=256"
       - export BUN_JOBS="${THREADS}"
       - export SWC_THREADS="${THREADS}"
-      - 'echo "Node: $(node -v)  Bun: $(bun --version)  THREADS=${THREADS}  TOTAL_MB=${TOTAL_MB}  HEAP_MB=${HEAP_MB}"'
-
+      - echo "Node: $(node -v)  Bun: $(bun --version)  THREADS=${THREADS}  TOTAL_MB=${TOTAL_MB}  HEAP_MB=${HEAP_MB}"
       - echo "Installing dependencies with Bun..."
       - if [ -f bun.lockb ]; then bun install --frozen-lockfile --no-progress; else bun install --no-progress; fi
 
   build:
     commands:
+      - set -euxo pipefail
       - echo "Building with ${THREADS} threads and heap ${HEAP_MB} MB..."
       - time ./scripts/build.sh
+      - |
+        if [ ! -f ".next/standalone/server.js" ]; then
+          echo "ERROR: .next/standalone/server.js not found. Ensure Next.js is configured with \`output: 'standalone'\` in next.config.js." >&2
+          echo "next.config.js (if present):" >&2
+          [ -f next.config.js ] && sed -n '1,120p' next.config.js >&2 || echo "(next.config.js not found)" >&2
+          exit 1
+        fi
+      - ls -la .next/standalone | head -n 50 || true
+      - ls -la .next/static | head -n 50 || true
 
 artifacts:
   files:
-    # deliver the standalone bundle, static assets and deployment scripts
     - .next/standalone/**/*
     - .next/static/**/*
     - public/**/*
@@ -54,5 +62,4 @@ artifacts:
 cache:
   paths:
     - '~/.bun/**/*'
-    - 'node_modules/**/*'
     - '.next/cache/**/*'
