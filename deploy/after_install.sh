@@ -36,5 +36,8 @@ if [ ! -x "$BUN_BIN" ]; then
   echo "ERROR: bun not found at $BUN_BIN"; exit 1;
 fi
 sudo -u lobechat env PATH="${BUN_HOME}/bin:/usr/bin:/bin" bash -lc 'bun --version || exit 1'
+# 确认 node 可用（systemd 会 source nvm，但这里也验证一次）
+sudo -u lobechat env HOME=/opt/lobechat NVM_DIR=/opt/lobechat/.nvm \
+  bash -lc '. "$NVM_DIR/nvm.sh"; nvm use --lts >/dev/null; node -v'
 
 log "after_install.sh done"

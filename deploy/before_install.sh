@@ -4,80 +4,30 @@ log(){ echo "[$(date +'%F %T')] $*"; }
 
 export DEBIAN_FRONTEND=noninteractive
 
-# ---------- 0) 小工具函数 ----------
-need_cmd(){ command -v "$1" >/dev/null 2>&1 || return 0 && return 1; }
-ensure_pkg(){
-  local pkgs=("$@")
-  apt-get update -y
-  apt-get install -y --no-install-recommends "${pkgs[@]}"
-}
+# 1) 基础依赖（按需）
+apt-get update -y
+apt-get install -y --no-install-recommends jq curl unzip ruby ca-certificates
 
-# ---------- 1) 基础依赖（按需装） ----------
-MISSING_PKGS=()
-need_cmd jq    && MISSING_PKGS+=("jq")
-need_cmd curl  && MISSING_PKGS+=("curl")
-need_cmd unzip && MISSING_PKGS+=("unzip")
-need_cmd ruby  && MISSING_PKGS+=("ruby")
-
-if [ "${#MISSING_PKGS[@]}" -gt 0 ]; then
-  log "Installing base packages: ${MISSING_PKGS[*]}"
-  ensure_pkg "${MISSING_PKGS[@]}"
-else
-  log "Base packages already present"
-fi
-
-# ---------- 2) AWS CLI v2：存在就跳过；v1 或未安装则安装 ----------
-AWS_NEED_INSTALL=0
-if ! command -v aws >/dev/null 2>&1; then
-  AWS_NEED_INSTALL=1
-else
-  # 解析主版本号
-  AWS_MAJOR="$(aws --version 2>&1 | awk -F/ '{print $2}' | cut -d. -f1)"
-  if [ -z "$AWS_MAJOR" ] || [ "$AWS_MAJOR" -lt 2 ]; then
-    AWS_NEED_INSTALL=1
-  fi
-fi
-
-if [ "$AWS_NEED_INSTALL" -eq 1 ]; then
-  ARCH="$(uname -m)"
-  case "$ARCH" in
-    aarch64|arm64) AWS_ZIP="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" ;;
-    x86_64)        AWS_ZIP="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" ;;
-    *) log "Unknown arch: $ARCH"; exit 1 ;;
-  esac
-  log "Installing AWS CLI v2 for $ARCH"
-  curl -fsSL -o /tmp/awscliv2.zip "$AWS_ZIP"
-  unzip -q /tmp/awscliv2.zip -d /tmp
-  /tmp/aws/install --update
-  aws --version || { log "AWS CLI install failed"; exit 1; }
-else
-  log "AWS CLI already OK: $(aws --version 2>&1)"
-fi
-
-# ---------- 3) 运行用户与目录 ----------
-if ! getent group lobechat >/dev/null; then
-  log "Creating group lobechat"
-  groupadd --system lobechat
-fi
-if ! id -u lobechat >/dev/null 2>&1; then
-  log "Creating user lobechat (home=/opt/lobechat, nologin)"
-  useradd --system --gid lobechat --home /opt/lobechat --shell /usr/sbin/nologin lobechat
-fi
+# 2) 运行用户与目录
+getent group lobechat >/dev/null || groupadd --system lobechat
+id -u lobechat >/dev/null 2>&1 || useradd --system --gid lobechat --home /opt/lobechat --shell /usr/sbin/nologin lobechat
 mkdir -p /opt/lobechat
 chown -R lobechat:lobechat /opt/lobechat
 chmod 755 /opt/lobechat
 
-# ---------- 4) Bun 按需安装（HOME=/opt/lobechat） ----------
-if [ ! -x /opt/lobechat/.bun/bin/bun ]; then
+APP_DIR="/opt/lobechat"
+BUN_HOME="${APP_DIR}/.bun"
+NVM_DIR="${APP_DIR}/.nvm"
+
+# 3) Bun（按需）
+if [ ! -x "${BUN_HOME}/bin/bun" ]; then
   log "Installing Bun for user lobechat"
-  sudo -u lobechat env HOME=/opt/lobechat BUN_INSTALL=/opt/lobechat/.bun \
+  sudo -u lobechat env HOME="${APP_DIR}" BUN_INSTALL="${BUN_HOME}" \
     bash -lc 'curl -fsSL https://bun.sh/install | bash'
 fi
-sudo -u lobechat env PATH=/opt/lobechat/.bun/bin:/usr/bin:/bin \
-  bash -lc 'bun --version || exit 1'
+sudo -u lobechat env PATH="${BUN_HOME}/bin:/usr/bin:/bin" bash -lc 'bun --version'
 
-# ---------- 5) systemd 单元（幂等写入） ----------
-log "Writing systemd unit /etc/systemd/system/lobechat.service"
+# 4) 写 systemd 单元（含 NVM 环境，注意无行尾注释）
 cat >/etc/systemd/system/lobechat.service <<'UNIT'
 [Unit]
 Description=LobeChat (Bun) Service
@@ -89,16 +39,24 @@ Type=simple
 User=lobechat
 Group=lobechat
 WorkingDirectory=/opt/lobechat
+
 EnvironmentFile=-/opt/lobechat/.env
 Environment=BUN_INSTALL=/opt/lobechat/.bun
+Environment=NVM_DIR=/opt/lobechat/.nvm
+# 先把 bun 放到 PATH，node 由 ExecStart 内 source nvm.sh 后注入
 Environment=PATH=/opt/lobechat/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ExecStart=/bin/bash -lc 'bun run start'
+
+# 在非交互 systemd 环境下，显式 source nvm.sh 再启动
+ExecStart=/bin/bash -lc 'set -e; if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; nvm use --lts >/dev/null; fi; echo "Node=$(command -v node) $(node -v 2>/dev/null || true)"; bun run start'
+
 Restart=always
 RestartSec=5
 TimeoutStartSec=60
 TimeoutStopSec=20
+
 LimitNOFILE=65535
 UMask=0027
+
 NoNewPrivileges=true
 PrivateTmp=true
 PrivateDevices=true
@@ -115,9 +73,11 @@ RestrictSUIDSGID=true
 RestrictRealtime=true
 RestrictNamespaces=true
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
 ReadWritePaths=/opt/lobechat
 CapabilityBoundingSet=
 AmbientCapabilities=
+
 [Install]
 WantedBy=multi-user.target
 UNIT
@@ -125,9 +85,19 @@ UNIT
 systemctl daemon-reload
 systemctl stop lobechat || true
 
-# ---------- 6) 首次占位 .env（AfterInstall 会从 SSM 覆盖） ----------
-if [ ! -f /opt/lobechat/.env ]; then
-  install -o lobechat -g lobechat -m 600 /dev/null /opt/lobechat/.env
+# 5) 占位 .env（AfterInstall 会覆盖）
+[ -f /opt/lobechat/.env ] || install -o lobechat -g lobechat -m 600 /dev/null /opt/lobechat/.env
+
+# 6) NVM + Node LTS（仅在 lobechat 用户下安装，按需）
+if ! sudo -u lobechat env HOME="${APP_DIR}" bash -lc 'command -v node >/dev/null 2>&1'; then
+  log "Installing NVM + Node LTS for user lobechat"
+  sudo -u lobechat env HOME="${APP_DIR}" \
+    bash -lc 'mkdir -p "$HOME/.nvm"; curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'
+  # 初始化 nvm 并安装 LTS
+  sudo -u lobechat env HOME="${APP_DIR}" NVM_DIR="${NVM_DIR}" \
+    bash -lc '. "$NVM_DIR/nvm.sh"; nvm install --lts; nvm alias default lts/*; nvm use --lts; node -v; which node'
+else
+  log "Node already present for lobechat: $(sudo -u lobechat env HOME="${APP_DIR}" bash -lc "node -v")"
 fi
 
 log "before_install.sh done"
