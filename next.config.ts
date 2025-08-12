@@ -3,19 +3,32 @@ import { withSentryConfig } from '@sentry/nextjs';
 import withSerwistInit from '@serwist/next';
 import type { NextConfig } from 'next';
 import ReactComponentName from 'react-scan/react-component-name/webpack';
+import path from 'node:path';
 
+// --- 环境标记 ---
 const isProd = process.env.NODE_ENV === 'production';
 const isDesktop = process.env.NEXT_PUBLIC_IS_DESKTOP_APP === '1';
 const enableReactScan = !!process.env.REACT_SCAN_MONITOR_API_KEY;
 const isUsePglite = process.env.NEXT_PUBLIC_CLIENT_DB === 'pglite';
-
-// if you need to proxy the api endpoint to remote server
-
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH;
 
+// 对于 monorepo/workspaces，Next 需要一个 “追踪根目录” 来正确打包 standalone 依赖。
+// 支持在 CI 里通过环境变量覆盖，例如：OUTPUT_FILE_TRACING_ROOT=/codebuild/output/src123/src
+const outputFileTracingRoot =
+  process.env.OUTPUT_FILE_TRACING_ROOT
+    ? path.resolve(process.env.OUTPUT_FILE_TRACING_ROOT)
+    : undefined;
+
 const nextConfig: NextConfig = {
+  // 关键：产出 standalone
   output: 'standalone',
+
+  // 追踪额外文件（你原有的规则保留）
   outputFileTracingIncludes: { '*': ['public/**/*', '.next/static/**/*'] },
+
+  // 如果提供了 tracing 根（monorepo 更稳），就启用
+  ...(outputFileTracingRoot ? { outputFileTracingRoot } : {}),
+
   basePath,
   compress: isProd,
   experimental: {
@@ -27,251 +40,99 @@ const nextConfig: NextConfig = {
       '@lobehub/ui',
       'gpt-tokenizer',
     ],
-    // oidc provider depend on constructor.name
-    // but swc minification will remove the name
-    // so we need to disable it
-    // refs: https://github.com/lobehub/lobe-chat/pull/7430
+    // OIDC 依赖 constructor.name，避免 SWC 去名
     serverMinification: false,
     webVitalsAttribution: ['CLS', 'LCP'],
   },
+
   async headers() {
     return [
-      {
-        headers: [
-          {
-            key: 'x-robots-tag',
-            value: 'all',
-          },
-        ],
-        source: '/:path*',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/icons/(.*).(png|jpe?g|gif|svg|ico|webp)',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Vercel-CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/images/(.*).(png|jpe?g|gif|svg|ico|webp)',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Vercel-CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/videos/(.*).(mp4|webm|ogg|avi|mov|wmv|flv|mkv)',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Vercel-CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/screenshots/(.*).(png|jpe?g|gif|svg|ico|webp)',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Vercel-CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/og/(.*).(png|jpe?g|gif|svg|ico|webp)',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/favicon.ico',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/favicon-32x32.ico',
-      },
-      {
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'CDN-Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-        source: '/apple-touch-icon.png',
-      },
+      { headers: [{ key: 'x-robots-tag', value: 'all' }], source: '/:path*' },
+      { headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }], source: '/icons/(.*).(png|jpe?g|gif|svg|ico|webp)' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Vercel-CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/images/(.*).(png|jpe?g|gif|svg|ico|webp)' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Vercel-CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/videos/(.*).(mp4|webm|ogg|avi|mov|wmv|flv|mkv)' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Vercel-CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/screenshots/(.*).(png|jpe?g|gif|svg|ico|webp)' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Vercel-CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/og/(.*).(png|jpe?g|gif|svg|ico|webp)' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/favicon.ico' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/favicon-32x32.ico' },
+      { headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'CDN-Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ], source: '/apple-touch-icon.png' },
     ];
   },
+
   logging: {
-    fetches: {
-      fullUrl: true,
-      hmrRefreshes: true,
-    },
+    fetches: { fullUrl: true, hmrRefreshes: true },
   },
+
+  poweredByHeader: false,
+
   reactStrictMode: true,
+
   redirects: async () => [
-    {
-      destination: '/sitemap-index.xml',
-      permanent: true,
-      source: '/sitemap.xml',
-    },
-    {
-      destination: '/sitemap-index.xml',
-      permanent: true,
-      source: '/sitemap-0.xml',
-    },
-    {
-      destination: '/sitemap/plugins-1.xml',
-      permanent: true,
-      source: '/sitemap/plugins.xml',
-    },
-    {
-      destination: '/sitemap/assistants-1.xml',
-      permanent: true,
-      source: '/sitemap/assistants.xml',
-    },
-    {
-      destination: '/manifest.webmanifest',
-      permanent: true,
-      source: '/manifest.json',
-    },
-    {
-      destination: '/discover/assistant',
-      permanent: true,
-      source: '/discover/assistants',
-    },
-    {
-      destination: '/discover/plugin',
-      permanent: true,
-      source: '/discover/plugins',
-    },
-    {
-      destination: '/discover/model',
-      permanent: true,
-      source: '/discover/models',
-    },
-    {
-      destination: '/discover/provider',
-      permanent: true,
-      source: '/discover/providers',
-    },
-    {
-      destination: '/settings/common',
-      permanent: true,
-      source: '/settings',
-    },
-    {
-      destination: '/chat',
-      permanent: true,
-      source: '/welcome',
-    },
-    // TODO: 等 V2 做强制跳转吧
-    // {
-    //   destination: '/settings/provider/volcengine',
-    //   permanent: true,
-    //   source: '/settings/provider/doubao',
-    // },
-    // we need back /repos url in the further
-    {
-      destination: '/files',
-      permanent: false,
-      source: '/repos',
-    },
+    { destination: '/sitemap-index.xml', permanent: true, source: '/sitemap.xml' },
+    { destination: '/sitemap-index.xml', permanent: true, source: '/sitemap-0.xml' },
+    { destination: '/sitemap/plugins-1.xml', permanent: true, source: '/sitemap/plugins.xml' },
+    { destination: '/sitemap/assistants-1.xml', permanent: true, source: '/sitemap/assistants.xml' },
+    { destination: '/manifest.webmanifest', permanent: true, source: '/manifest.json' },
+    { destination: '/discover/assistant', permanent: true, source: '/discover/assistants' },
+    { destination: '/discover/plugin', permanent: true, source: '/discover/plugins' },
+    { destination: '/discover/model', permanent: true, source: '/discover/models' },
+    { destination: '/discover/provider', permanent: true, source: '/discover/providers' },
+    { destination: '/settings/common', permanent: true, source: '/settings' },
+    { destination: '/chat', permanent: true, source: '/welcome' },
+    { destination: '/files', permanent: false, source: '/repos' },
   ],
-  // when external packages in dev mode with turbopack, this config will lead to bundle error
+
+  // dev 用 turbopack 时避免 pglite 被外部化
   serverExternalPackages: isProd ? ['@electric-sql/pglite'] : undefined,
 
   transpilePackages: ['pdfjs-dist', 'mermaid'],
 
   webpack(config) {
-    config.experiments = {
-      asyncWebAssembly: true,
-      layers: true,
-    };
+    config.experiments = { asyncWebAssembly: true, layers: true };
 
-    // 开启该插件会导致 pglite 的 fs bundler 被改表
     if (enableReactScan && !isUsePglite) {
       config.plugins.push(ReactComponentName({}));
     }
 
-    // to fix shikiji compile error
-    // refs: https://github.com/antfu/shikiji/issues/23
+    // shikiji 兼容
     config.module.rules.push({
-      resolve: {
-        fullySpecified: false,
-      },
+      resolve: { fullySpecified: false },
       test: /\.m?js$/,
       type: 'javascript/auto',
     });
 
-    // https://github.com/pinojs/pino/issues/688#issuecomment-637763276
+    // pino pretty 仅开发用
     config.externals.push('pino-pretty');
 
+    // 禁用可选的原生 canvas 依赖，避免服务器缺二进制时报错
     config.resolve.alias.canvas = false;
 
-    // to ignore epub2 compile error
-    // refs: https://github.com/lobehub/lobe-chat/discussions/6769
+    // 避免一些 Node 内置模块在浏览器端被打进包
     config.resolve.fallback = {
       ...config.resolve.fallback,
       crypto: 'crypto-browserify',
@@ -287,17 +148,7 @@ const nextConfig: NextConfig = {
 };
 
 const noWrapper = (config: NextConfig) => config;
-
 const withBundleAnalyzer = process.env.ANALYZE === 'true' ? analyzer() : noWrapper;
-
-const withPWA =
-  isProd && !isDesktop
-    ? withSerwistInit({
-        register: false,
-        swDest: 'public/sw.js',
-        swSrc: 'src/app/sw.ts',
-      })
-    : noWrapper;
 
 const hasSentry = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
 const withSentry =
@@ -307,40 +158,23 @@ const withSentry =
           c,
           {
             org: process.env.SENTRY_ORG,
-
             project: process.env.SENTRY_PROJECT,
-            // For all available options, see:
-            // https://github.com/getsentry/sentry-webpack-plugin#options
-            // Suppresses source map uploading logs during build
             silent: true,
           },
           {
-            // Enables automatic instrumentation of Vercel Cron Monitors.
-            // See the following for more information:
-            // https://docs.sentry.io/product/crons/
-            // https://vercel.com/docs/cron-jobs
             automaticVercelMonitors: true,
-
-            // Automatically tree-shake Sentry logger statements to reduce bundle size
             disableLogger: true,
-
-            // Hides source maps from generated client bundles
             hideSourceMaps: true,
-
-            // Transpiles SDK to be compatible with IE11 (increases bundle size)
             transpileClientSDK: true,
-
-            // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers. (increases server load)
-            // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-            // side errors will fail.
             tunnelRoute: '/monitoring',
-
-            // For all available options, see:
-            // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-            // Upload a larger set of source maps for prettier stack traces (increases build time)
             widenClientFileUpload: true,
           },
         )
+    : noWrapper;
+
+const withPWA =
+  isProd && !isDesktop
+    ? withSerwistInit({ register: false, swDest: 'public/sw.js', swSrc: 'src/app/sw.ts' })
     : noWrapper;
 
 export default withBundleAnalyzer(withPWA(withSentry(nextConfig) as NextConfig));
