@@ -13,13 +13,14 @@ phases:
       nodejs: 22
     commands:
       - set -euxo pipefail
-      - |
-        if [ ! -x "$HOME/.bun/bin/bun" ]; then
-          echo "Installing Bun..."
-          curl -fsSL https://bun.sh/install | bash
-        else
-          echo "Using cached Bun at $HOME/.bun/bin/bun"
-        fi
+      - |-
+          # Install Bun if missing (use cache if present)
+          if [ ! -x "$HOME/.bun/bin/bun" ]; then
+            echo "Installing Bun..."
+            curl -fsSL https://bun.sh/install | bash
+          else
+            echo "Using cached Bun at $HOME/.bun/bin/bun"
+          fi
       - export BUN_INSTALL="$HOME/.bun"
       - export PATH="$BUN_INSTALL/bin:$PATH"
       - export THREADS="$(nproc)"
@@ -29,20 +30,29 @@ phases:
       - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=256"
       - export BUN_JOBS="${THREADS}"
       - export SWC_THREADS="${THREADS}"
-      - echo "Node: $(node -v)  Bun: $(bun --version)  THREADS=${THREADS}  TOTAL_MB=${TOTAL_MB}  HEAP_MB=${HEAP_MB}"
       - echo "Installing dependencies with Bun..."
-      - if [ -f bun.lockb ]; then bun install --frozen-lockfile --no-progress; else bun install --no-progress; fi
+      - |-
+        if [ -f bun.lockb ]; then
+          bun install --frozen-lockfile --no-progress
+        else
+          bun install --no-progress
+        fi
 
   build:
     commands:
       - set -euxo pipefail
       - echo "Building with ${THREADS} threads and heap ${HEAP_MB} MB..."
       - time ./scripts/build.sh
-      - |
+      - |-
+        # Strong assert: Next standalone must exist
         if [ ! -f ".next/standalone/server.js" ]; then
           echo "ERROR: .next/standalone/server.js not found. Ensure Next.js is configured with output: 'standalone' in next.config.js." >&2
           echo "next.config.js (if present):" >&2
-          [ -f next.config.js ] && sed -n '1,120p' next.config.js >&2 || echo "(next.config.js not found)" >&2
+          if [ -f next.config.js ]; then
+            sed -n '1,120p' next.config.js >&2
+          else
+            echo "(next.config.js not found)" >&2
+          fi
           exit 1
         fi
       - ls -la .next/standalone | head -n 50 || true
@@ -61,5 +71,5 @@ artifacts:
 
 cache:
   paths:
-    - '~/.bun/**/*'
-    - '.next/cache/**/*'
+    - "~/.bun/**/*"
+    - ".next/cache/**/*"
