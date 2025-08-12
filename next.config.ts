@@ -5,7 +5,6 @@ import type { NextConfig } from 'next';
 import ReactComponentName from 'react-scan/react-component-name/webpack';
 
 const isProd = process.env.NODE_ENV === 'production';
-const buildWithDocker = process.env.DOCKER === 'true';
 const isDesktop = process.env.NEXT_PUBLIC_IS_DESKTOP_APP === '1';
 const enableReactScan = !!process.env.REACT_SCAN_MONITOR_API_KEY;
 const isUsePglite = process.env.NEXT_PUBLIC_CLIENT_DB === 'pglite';
@@ -13,15 +12,10 @@ const isUsePglite = process.env.NEXT_PUBLIC_CLIENT_DB === 'pglite';
 // if you need to proxy the api endpoint to remote server
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH;
-const isStandaloneMode = buildWithDocker || isDesktop;
-
-const standaloneConfig: NextConfig = {
-  output: 'standalone',
-  outputFileTracingIncludes: { '*': ['public/**/*', '.next/static/**/*'] },
-};
 
 const nextConfig: NextConfig = {
-  ...(isStandaloneMode ? standaloneConfig : {}),
+  output: 'standalone',
+  outputFileTracingIncludes: { '*': ['public/**/*', '.next/static/**/*'] },
   basePath,
   compress: isProd,
   experimental: {
