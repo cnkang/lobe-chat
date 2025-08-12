@@ -30,8 +30,8 @@ chmod 600 .env
 # 统一归属，确保服务用户可读写产物
 chown -R lobechat:lobechat "$APP_DIR"
 
-# 轻量自检（不装依赖）
-[ -d ".next/standalone" ] || echo "WARN: .next/standalone missing (check artifacts)"
-[ -f "package.json" ] || echo "WARN: package.json missing"
+# 轻量自检（standalone 只需要下面两块）
+[ -f ".next/standalone/server.js" ] || { echo "ERROR: standalone server.js missing"; exit 1; }
+[ -d ".next/static" ] || echo "WARN: .next/static missing"
 
 log "after_install.sh done"
