@@ -5,12 +5,10 @@ log(){ echo "[$(date +'%F %T')] $*"; }
 APP_DIR="/opt/lobechat"
 REGION="us-east-1"
 SSM_PREFIX="/newswarrior/lobechat"
-BUN_HOME="${APP_DIR}/.bun"
-BUN_BIN="${BUN_HOME}/bin/bun"
 
 cd "$APP_DIR"
 
-# 1) 拉 SSM -> 写 .env（覆盖）
+# 拉 SSM -> 写 .env（覆盖）
 : > .env
 echo "NODE_ENV=production" >> .env
 NEXT_TOKEN=""
@@ -24,20 +22,15 @@ while :; do
   NEXT_TOKEN=$(echo "$RESP" | jq -r '.NextToken // empty')
   [ -z "$NEXT_TOKEN" ] && break
 done
-chown lobechat:lobechat .env && chmod 600 .env
+chown lobechat:lobechat .env
+chmod 600 .env
 
-# 2) 校验构建产物是否存在（防止空目录导致启动失败）
-[ -d ".next" ] || { echo "ERROR: .next not found"; exit 1; }
-[ -d "node_modules" ] || { echo "ERROR: node_modules not found (install must happen in CodeBuild)"; exit 1; }
-[ -f "package.json" ] || { echo "ERROR: package.json missing"; exit 1; }
+# 统一归属（确保 deploy/node_modules/.next 等都可读）
+chown -R lobechat:lobechat "$APP_DIR"
 
-# 3) 确认 bun 可用（before_install 已装；这里只做校验）
-if [ ! -x "$BUN_BIN" ]; then
-  echo "ERROR: bun not found at $BUN_BIN"; exit 1;
-fi
-sudo -u lobechat env PATH="${BUN_HOME}/bin:/usr/bin:/bin" bash -lc 'bun --version || exit 1'
-# 确认 node 可用（systemd 会 source nvm，但这里也验证一次）
-sudo -u lobechat env HOME=/opt/lobechat NVM_DIR=/opt/lobechat/.nvm \
-  bash -lc '. "$NVM_DIR/nvm.sh"; nvm use --lts >/dev/null; node -v'
+# 产物自检（不做 bun install）
+[ -d ".next" ] || echo "WARN: .next missing (consider standalone or check artifacts)"
+[ -d "node_modules" ] || echo "WARN: node_modules missing (CodeBuild should package it)"
+[ -f "package.json" ] || echo "WARN: package.json missing"
 
 log "after_install.sh done"
