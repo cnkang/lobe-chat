@@ -33,6 +33,22 @@ phases:
   build:
     commands:
       - set -euxo pipefail
+      - echo "Loading environment variables from SSM"
+      - |
+        REGION="us-east-1"
+        SSM_PREFIX="/newswarrior/lobechat"
+        NEXT_TOKEN=""
+        while :; do
+          if [ -z "${NEXT_TOKEN:-}" ]; then
+            RESP=$(aws ssm get-parameters-by-path --path "${SSM_PREFIX}/" --with-decryption --recursive --region "$REGION" --output json)
+          else
+            RESP=$(aws ssm get-parameters-by-path --path "${SSM_PREFIX}/" --with-decryption --recursive --region "$REGION" --output json --starting-token "$NEXT_TOKEN")
+          fi
+          echo "$RESP" | jq -r '.Parameters[] | "export \(.Name|split("/")[-1])=\(.Value)"' >> /tmp/ssm_env.sh
+          NEXT_TOKEN=$(echo "$RESP" | jq -r '.NextToken // empty')
+          [ -z "$NEXT_TOKEN" ] && break
+        done
+        source /tmp/ssm_env.sh
       - echo "Running Next.js build (standalone mode)"
       - export OUTPUT_FILE_TRACING_ROOT=$CODEBUILD_SRC_DIR
       - bun run prebuild || true
