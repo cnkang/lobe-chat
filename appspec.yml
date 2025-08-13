@@ -23,4 +23,4 @@ hooks:
   ApplicationStart:
     - location: deploy/start_server.sh
       timeout: 300
-      runas: lobechat
+      runas: root
