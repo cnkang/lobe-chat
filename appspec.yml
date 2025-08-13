@@ -19,7 +19,7 @@ hooks:
   AfterInstall:
     - location: deploy/after_install.sh
       timeout: 300
-      runas: lobechat
+      runas: root
   ApplicationStart:
     - location: deploy/start_server.sh
       timeout: 300
