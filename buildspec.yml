@@ -52,8 +52,9 @@ phases:
       - echo "Running Next.js build (standalone mode)"
       - export OUTPUT_FILE_TRACING_ROOT=$CODEBUILD_SRC_DIR
       - bun run prebuild || true
-      - npx next build
-      - bun run postbuild || true
+      - DOCKER=true npx next build
+      - bun run build-sitemap || true
+      - bun run build-migrate-db || true
       - |
         if [ ! -f ".next/standalone/server.js" ]; then
           echo "❌ ERROR: .next/standalone/server.js not found. Check next.config.js has output: 'standalone'" >&2
