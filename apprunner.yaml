@@ -21,7 +21,7 @@ build:
     - name: NEXT_TELEMETRY_DISABLED
       value: "1"
 run:
-  runtime-version: 22
+  runtime-version: 22.17.0
   command: node .next/standalone/server.js
   network:
     port: 3000
