@@ -38,9 +38,10 @@ phases:
       - export OUTPUT_FILE_TRACING_ROOT=$CODEBUILD_SRC_DIR
       - echo "OUTPUT_FILE_TRACING_ROOT=$OUTPUT_FILE_TRACING_ROOT"
       - export TOTAL_MB="$(awk '/MemTotal/ {printf "%.0f", $2/1024}' /proc/meminfo)"
-      - export HEAP_MB="$(( TOTAL_MB * 80 / 100 ))"
-      - if [ "$HEAP_MB" -lt 6144 ]; then export HEAP_MB=6144; fi
-      - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=256"
+      - export HEAP_MB="$(( TOTAL_MB * 60 / 100 ))"
+      - if [ "$HEAP_MB" -lt 4096 ]; then export HEAP_MB=4096; fi
+      - if [ "$HEAP_MB" -gt 6144 ]; then export HEAP_MB=6144; fi
+      - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=128"
       - export BUN_JOBS="${THREADS}"
       - export SWC_THREADS="${THREADS}"
       - if [ -f bun.lockb ]; then bun install --frozen-lockfile --no-progress; else bun install --no-progress; fi
@@ -76,7 +77,7 @@ phases:
           exit 1
         fi
       - echo "Building Docker image..."
-      - docker build -f Dockerfile.codebuild -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker build -f Dockerfile.codebuild -t $IMAGE_REPO_NAME:$IMAGE_TAG . || exit 1
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:latest
 
