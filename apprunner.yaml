@@ -2,16 +2,60 @@ version: 1.0
 runtime: nodejs22
 build:
   commands:
-    build:
+    install:
+      - echo "==> Installing Bun"
+      - curl -fsSL https://bun.sh/install | bash
+      - export BUN_INSTALL="$HOME/.bun"
+      - export PATH="$BUN_INSTALL/bin:$PATH"
       - echo "==> Installing dependencies"
-      - npm ci
-      - echo "==> Building application"
-      - npm run build
-      - echo "==> Build completed"
+      - if [ -f bun.lockb ]; then bun install --frozen-lockfile --no-progress; else bun install --no-progress; fi
+    build:
+      - export BUN_INSTALL="$HOME/.bun"
+      - export PATH="$BUN_INSTALL/bin:$PATH"
+      - export THREADS="$(nproc)"
+      - export TOTAL_MB="$(awk '/MemTotal/ {printf "%.0f", $2/1024}' /proc/meminfo)"
+      - export HEAP_MB="$(( TOTAL_MB * 80 / 100 ))"
+      - if [ "$HEAP_MB" -lt 6144 ]; then export HEAP_MB=6144; fi
+      - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=256"
+      - export BUN_JOBS="${THREADS}"
+      - export SWC_THREADS="${THREADS}"
+      - echo "==> Loading environment variables from SSM"
+      - |
+        REGION="us-east-1"
+        SSM_PREFIX="/newswarrior/lobechat"
+        NEXT_TOKEN=""
+        while :; do
+          if [ -z "${NEXT_TOKEN:-}" ]; then
+            RESP=$(aws ssm get-parameters-by-path --path "${SSM_PREFIX}/" --with-decryption --recursive --region "$REGION" --output json)
+          else
+            RESP=$(aws ssm get-parameters-by-path --path "${SSM_PREFIX}/" --with-decryption --recursive --region "$REGION" --output json --starting-token "$NEXT_TOKEN")
+          fi
+          echo "$RESP" | jq -r '.Parameters[] | "export \(.Name|split("/")[-1])=\(.Value)"' >> /tmp/ssm_env.sh
+          NEXT_TOKEN=$(echo "$RESP" | jq -r '.NextToken // empty')
+          [ -z "$NEXT_TOKEN" ] && break
+        done
+        source /tmp/ssm_env.sh
+      - echo "==> Running prebuild tasks"
+      - bun run prebuild || true
+      - echo "==> Building Next.js application (standalone mode)"
+      - DOCKER=true npx next build
+      - echo "==> Building sitemap"
+      - bun run build-sitemap || true
+      - echo "==> Building database migrations"
+      - bun run build-migrate-db || true
+      - echo "==> Verifying standalone build"
+      - |
+        if [ ! -f ".next/standalone/server.js" ]; then
+          echo "❌ ERROR: .next/standalone/server.js not found. Check next.config.js has output: 'standalone'" >&2
+          exit 1
+        fi
+      - echo "==> Build completed successfully"
   env:
     - name: NODE_ENV
       value: production
     - name: NEXT_TELEMETRY_DISABLED
+      value: "1"
+    - name: CI
       value: "1"
 run:
   runtime-version: 22
@@ -19,14 +63,6 @@ run:
   network:
     port: 3000
     env: PORT
-  pre-run:
-    - echo "==> Installing AWS CLI"
-    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    - unzip awscliv2.zip
-    - ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli
-    - echo "==> Loading environment variables from SSM"
-    - aws ssm get-parameters-by-path --path "/newswarrior/lobechat/" --with-decryption --recursive --region us-east-1 --query 'Parameters[*].[Name,Value]' --output text | sed 's|/newswarrior/lobechat/||g' | awk '{print $1"="$2}' > .env
-    - echo "NODE_ENV=production" >> .env
   env:
     - name: NODE_ENV
       value: production
