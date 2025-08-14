@@ -6,14 +6,15 @@ env:
     NEXT_TELEMETRY_DISABLED: "1"
     CI: "1"
     AWS_DEFAULT_REGION: us-east-1
-    AWS_ACCOUNT_ID: "${AWS_ACCOUNT_ID}"
-    IMAGE_REPO_NAME: "${IMAGE_REPO_NAME:-lobe-chat}"
-    IMAGE_TAG: "${IMAGE_TAG:-latest}"
+    IMAGE_REPO_NAME: lobe-chat
+    IMAGE_TAG: latest
 
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - echo AWS Account ID is $AWS_ACCOUNT_ID
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
