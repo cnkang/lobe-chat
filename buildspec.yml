@@ -24,7 +24,6 @@ phases:
   install:
     runtime-versions:
       nodejs: 22
-      docker: 23
     commands:
       - set -euxo pipefail
       - |
