@@ -59,9 +59,10 @@ ExecStart=/bin/bash -lc 'set -e; \
   nvm install --lts >/dev/null 2>&1 || true; \
   nvm use --lts >/dev/null; \
   export PATH="$(dirname "$(nvm which --lts)"):$PATH"; \
-  cd /opt/lobechat; \
+  cd /opt/lobechat/.next/standalone; \
   echo "Node=$(command -v node) $(node -v)"; \
-  exec node .next/standalone/server.js -p 3210'
+  export PORT=3210; \
+  exec node server.js'
 
 Restart=always
 RestartSec=5
