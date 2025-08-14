@@ -1,6 +1,5 @@
-import { ChatErrorType, ErrorResponse, ErrorType } from '@lobechat/types/fetch';
-
-import { AgentRuntimeErrorType, ILobeAgentRuntimeErrorType } from '@/libs/model-runtime';
+import { AgentRuntimeErrorType, ILobeAgentRuntimeErrorType } from '@lobechat/model-runtime';
+import { ChatErrorType, ErrorResponse, ErrorType } from '@lobechat/types';
 
 const getStatus = (errorType: ILobeAgentRuntimeErrorType | ErrorType) => {
   // InvalidAccessCode / InvalidAzureAPIKey / InvalidOpenAIAPIKey / InvalidZhipuAPIKey ....

@@ -1,7 +1,12 @@
+import {
+  AgentRuntimeError,
+  AgentRuntimeErrorType,
+  ModelProvider,
+  ModelRuntime,
+} from '@lobechat/model-runtime';
+
 import { getLLMConfig } from '@/config/llm';
 import { ClientSecretPayload } from '@/const/auth';
-import { AgentRuntimeErrorType, ModelProvider, ModelRuntime } from '@/libs/model-runtime';
-import { AgentRuntimeError } from '@/libs/model-runtime/utils/createError';
 
 import apiKeyManager from './apiKeyManager';
 
@@ -27,7 +32,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const apiKey = apiKeyManager.pick(payload?.apiKey || llmConfig.OPENAI_API_KEY);
       const baseURL = payload?.baseURL || process.env.OPENAI_PROXY_URL;
 
@@ -36,7 +41,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
 
     default: {
       let upperProvider = provider.toUpperCase();
-      
+
       // Check if the provider is enabled
       const enabledKey = `ENABLED_${upperProvider}`;
       if (enabledKey in llmConfig && !llmConfig[enabledKey]) {
@@ -64,7 +69,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const baseURL = payload?.baseURL || process.env.OLLAMA_PROXY_URL;
 
       return { baseURL };
@@ -78,7 +83,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { AZURE_API_KEY, AZURE_API_VERSION, AZURE_ENDPOINT } = llmConfig;
       const apiKey = apiKeyManager.pick(payload?.apiKey || AZURE_API_KEY);
       const baseURL = payload?.baseURL || AZURE_ENDPOINT;
@@ -94,7 +99,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { AZUREAI_ENDPOINT, AZUREAI_ENDPOINT_KEY } = llmConfig;
       const apiKey = payload?.apiKey || AZUREAI_ENDPOINT_KEY;
       const baseURL = payload?.baseURL || AZUREAI_ENDPOINT;
@@ -109,7 +114,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { AWS_REGION, AWS_BEARER_TOKEN_BEDROCK } = llmConfig;
 
       let region = AWS_REGION || 'us-east-1';
@@ -131,7 +136,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { CLOUDFLARE_API_KEY, CLOUDFLARE_BASE_URL_OR_ACCOUNT_ID } = llmConfig;
 
       const apiKey = apiKeyManager.pick(payload?.apiKey || CLOUDFLARE_API_KEY);
@@ -151,7 +156,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { GITEE_AI_API_KEY } = llmConfig;
 
       const apiKey = apiKeyManager.pick(payload?.apiKey || GITEE_AI_API_KEY);
@@ -167,7 +172,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { GITHUB_TOKEN } = llmConfig;
 
       const apiKey = apiKeyManager.pick(payload?.apiKey || GITHUB_TOKEN);
@@ -183,7 +188,7 @@ const getParamsFromPayload = (provider: string, payload: ClientSecretPayload) =>
           provider,
         });
       }
-      
+
       const { TENCENT_CLOUD_API_KEY } = llmConfig;
 
       const apiKey = apiKeyManager.pick(payload?.apiKey || TENCENT_CLOUD_API_KEY);

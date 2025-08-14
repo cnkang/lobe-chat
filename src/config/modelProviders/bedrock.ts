@@ -19,10 +19,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 8,
         output: 32,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 300_000,
       description:
@@ -35,10 +35,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.8,
         output: 3.2,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 300_000,
       description:
@@ -51,10 +51,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.06,
         output: 0.24,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 128_000,
       description:
@@ -67,9 +67,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.035,
         output: 0.14,
-      },
+      } as any,
       releasedAt: '2024-12-03',
-    },
+    } as any,
     // EU Region Nova Models
     {
       contextWindowTokens: 300_000,
@@ -82,10 +82,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.8,
         output: 3.2,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 300_000,
       description: 'Amazon Nova Lite 欧盟区域版本，快速且成本效益高。',
@@ -97,10 +97,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.06,
         output: 0.24,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Amazon Nova Micro 欧盟区域版本，专为速度和成本效率而设计。',
@@ -112,9 +112,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.035,
         output: 0.14,
-      },
+      } as any,
       releasedAt: '2024-12-03',
-    },
+    } as any,
     // APAC Region Nova Models
     {
       contextWindowTokens: 300_000,
@@ -127,10 +127,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.8,
         output: 3.2,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 300_000,
       description: 'Amazon Nova Lite 亚太区域版本，快速且成本效益高。',
@@ -142,10 +142,10 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.06,
         output: 0.24,
-      },
+      } as any,
       releasedAt: '2024-12-03',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Amazon Nova Micro 亚太区域版本，专为速度和成本效率而设计。',
@@ -157,9 +157,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.035,
         output: 0.14,
-      },
+      } as any,
       releasedAt: '2024-12-03',
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description:
@@ -169,15 +169,9 @@ const Bedrock: ModelProviderCard = {
       functionCall: true,
       id: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
       maxOutput: 8192,
-      pricing: {
-        cachedInput: 0.1,
-        input: 1,
-        output: 5,
-        writeCacheInput: 1.25,
-      },
       releasedAt: '2025-02-24',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3.7 Sonnet 欧盟区域版本，是 Anthropic 最快的下一代模型。',
@@ -185,16 +179,16 @@ const Bedrock: ModelProviderCard = {
       enabled: true,
       functionCall: true,
       id: 'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
-      maxOutput: 8192,
+      maxOutput: 64_000,
       pricing: {
         cachedInput: 0.1,
         input: 1,
         output: 5,
         writeCacheInput: 1.25,
-      },
+      } as any,
       releasedAt: '2025-02-24',
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3.7 Sonnet 亚太区域版本，是 Anthropic 最快的下一代模型。',
@@ -208,10 +202,10 @@ const Bedrock: ModelProviderCard = {
         input: 1,
         output: 5,
         writeCacheInput: 1.25,
-      },
-      releasedAt: '2025-02-24',
+      } as any,
+      releasedAt: '2025-11-05',
       vision: true,
-    },
+    } as any,
 
     {
       contextWindowTokens: 200_000,
@@ -224,9 +218,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3.5 Sonnet 亚太区域版本，提升了行业标准。',
@@ -237,9 +231,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
 
     {
       contextWindowTokens: 200_000,
@@ -251,9 +245,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3.5 Sonnet 0620 亚太区域版本，提升了行业标准。',
@@ -264,9 +258,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
 
     {
       contextWindowTokens: 200_000,
@@ -278,9 +272,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.25,
         output: 1.25,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3 Haiku 欧盟区域版本，是 Anthropic 最快、最紧凑的模型。',
@@ -291,9 +285,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.25,
         output: 1.25,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3 Haiku 亚太区域版本，是 Anthropic 最快、最紧凑的模型。',
@@ -304,9 +298,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.25,
         output: 1.25,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
 
     {
       contextWindowTokens: 200_000,
@@ -318,9 +312,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3 Sonnet 欧盟区域版本，在智能和速度之间达到了理想的平衡。',
@@ -331,9 +325,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3 Sonnet 亚太区域版本，在智能和速度之间达到了理想的平衡。',
@@ -344,9 +338,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
 
     {
       contextWindowTokens: 200_000,
@@ -358,9 +352,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 15,
         output: 75,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     // Claude 4 Models (Cross-Region)
     {
       contextWindowTokens: 200_000,
@@ -373,9 +367,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 60,
         output: 180,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description:
@@ -387,9 +381,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 15,
         output: 75,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 4 Sonnet 欧盟区域版本，是 Anthropic 新一代的平衡型模型。',
@@ -400,9 +394,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 15,
         output: 75,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 4 Sonnet 亚太区域版本，是 Anthropic 新一代的平衡型模型。',
@@ -413,9 +407,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 15,
         output: 75,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
 
     // DeepSeek Models (Cross-Region)
     {
@@ -428,8 +422,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.14,
         output: 2.19,
-      },
-    },
+      } as any,
+    } as any,
     // Meta Llama Models (Cross-Region)
 
     {
@@ -442,8 +436,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.22,
         output: 0.22,
-      },
-    },
+      } as any,
+    } as any,
 
     {
       contextWindowTokens: 128_000,
@@ -455,8 +449,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.99,
         output: 0.99,
-      },
-    },
+      } as any,
+    } as any,
 
     {
       contextWindowTokens: 128_000,
@@ -468,8 +462,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 5.32,
         output: 16,
-      },
-    },
+      } as any,
+    } as any,
     // Llama 3.2 Models (Cross-Region)
     {
       contextWindowTokens: 128_000,
@@ -481,8 +475,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.35,
         output: 0.35,
-      },
-    },
+      } as any,
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Meta Llama 3.2 1B Instruct 是一个轻量级模型，专为资源受限环境设计。',
@@ -493,8 +487,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.055,
         output: 0.055,
-      },
-    },
+      } as any,
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Meta Llama 3.2 1B Instruct 欧盟区域版本，是一个轻量级模型。',
@@ -505,8 +499,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.055,
         output: 0.055,
-      },
-    },
+      } as any,
+    } as any,
     {
       contextWindowTokens: 128_000,
       description:
@@ -518,8 +512,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.075,
         output: 0.075,
-      },
-    },
+      } as any,
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Meta Llama 3.2 3B Instruct 欧盟区域版本，在效率和性能之间取得平衡。',
@@ -530,8 +524,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.075,
         output: 0.075,
-      },
-    },
+      } as any,
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Meta Llama 3.2 90B Instruct 是一个大型高性能模型，适合复杂的推理和生成任务。',
@@ -542,8 +536,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 2,
         output: 2,
-      },
-    },
+      } as any,
+    } as any,
     // Llama 3.3 Models (Cross-Region)
     {
       contextWindowTokens: 128_000,
@@ -555,8 +549,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.99,
         output: 0.99,
-      },
-    },
+      } as any,
+    } as any,
     // Llama 4 Models (Cross-Region)
     {
       contextWindowTokens: 128_000,
@@ -569,8 +563,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.5,
         output: 0.5,
-      },
-    },
+      } as any,
+    } as any,
     {
       contextWindowTokens: 128_000,
       description:
@@ -582,8 +576,8 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.5,
         output: 0.5,
-      },
-    },
+      } as any,
+    } as any,
 
     // Mistral Models (Cross-Region)
     {
@@ -597,9 +591,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 9,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 128_000,
       description: 'Mistral Pixtral Large 欧盟区域版本，是一个多模态模型。',
@@ -610,9 +604,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 9,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     // US GovCloud Models
     {
       contextWindowTokens: 200_000,
@@ -624,9 +618,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 3,
         output: 15,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
     {
       contextWindowTokens: 200_000,
       description: 'Claude 3 Haiku 美国政府专区版本，是 Anthropic 最快、最紧凑的模型。',
@@ -637,9 +631,9 @@ const Bedrock: ModelProviderCard = {
       pricing: {
         input: 0.25,
         output: 1.25,
-      },
+      } as any,
       vision: true,
-    },
+    } as any,
   ],
   checkModel: 'us.amazon.nova-lite-v1:0',
   description:
@@ -647,7 +641,7 @@ const Bedrock: ModelProviderCard = {
   id: 'bedrock',
   modelsUrl: 'https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html',
   name: 'Bedrock',
-  settings: { sdkType: 'bedrock' },
+  settings: { sdkType: 'bedrock' } as any,
   url: 'https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html',
 };
 
