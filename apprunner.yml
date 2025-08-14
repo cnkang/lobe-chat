@@ -1,8 +1,15 @@
 version: 1.0
-runtime: nodejs18
+runtime: nodejs22
 build:
   commands:
     build:
+      - echo "==> Installing AWS CLI"
+      - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      - unzip awscliv2.zip
+      - ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli
+      - echo "==> Loading environment variables from SSM"
+      - aws ssm get-parameters-by-path --path "/newswarrior/lobechat/" --with-decryption --recursive --region us-east-1 --query 'Parameters[*].[Name,Value]' --output text | sed 's|/newswarrior/lobechat/||g' | awk '{print $1"="$2}' > .env
+      - echo "NODE_ENV=production" >> .env
       - echo "==> Installing dependencies"
       - npm ci
       - echo "==> Building application"
@@ -14,7 +21,7 @@ build:
     - name: NEXT_TELEMETRY_DISABLED
       value: "1"
 run:
-  runtime-version: 18
+  runtime-version: 22
   command: node .next/standalone/server.js
   network:
     port: 3000
