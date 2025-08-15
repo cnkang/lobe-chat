@@ -104,6 +104,11 @@ vertex-ai-key.json
 
 CLAUDE.local.md
 
+# Steering documents
+steering/
+*.steering
+steering.md
+
 # Misc
 ./packages/lobe-ui
 *.ppt*
