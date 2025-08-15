@@ -53,6 +53,20 @@ jobs:
     - name: Install dependencies
       run: bun install --frozen-lockfile
 
+    - name: Load environment variables from SSM
+      run: |
+        aws ssm get-parameters-by-path \
+          --path "/newswarrior/lobechat/" \
+          --recursive \
+          --with-decryption \
+          --region ${{ env.AWS_REGION }} \
+          --query 'Parameters[].[Name,Value]' \
+          --output text | \
+        while read -r param_name param_value; do
+          key_name=$(echo "$param_name" | sed 's|/newswarrior/lobechat/||')
+          echo "$key_name=$param_value" >> $GITHUB_ENV
+        done
+
     - name: Build Next.js app
       env:
         NODE_OPTIONS: "--max-old-space-size=8192"
