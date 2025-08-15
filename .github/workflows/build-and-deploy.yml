@@ -90,21 +90,25 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Prepare Vercel output
-      if: github.event_name == 'push'
-      run: |
-        mkdir -p .vercel/output
-        cp -r .next/* .vercel/output/
-        echo '{"version":3}' > .vercel/output/config.json
-
-    - name: Deploy to Vercel
-      if: github.event_name == 'push'
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.ORG_ID }}
-        vercel-project-id: ${{ secrets.PROJECT_ID }}
-        vercel-args: '--prod --prebuilt'
+    # Vercel deployment temporarily disabled due to API limits
+    # - name: Prepare Vercel output
+    #   if: github.event_name == 'push'
+    #   run: |
+    #     mkdir -p .vercel/output/static
+    #     cp -r .next/static/* .vercel/output/static/ 2>/dev/null || true
+    #     cp -r .next/server .vercel/output/ 2>/dev/null || true
+    #     cp .next/*.json .vercel/output/ 2>/dev/null || true
+    #     echo '{"version":3,"routes":[{"src":"/.*","dest":"/index.html"}]}' > .vercel/output/config.json
+    #     du -sh .vercel/output
+    #
+    # - name: Deploy to Vercel
+    #   if: github.event_name == 'push'
+    #   uses: amondnet/vercel-action@v25
+    #   with:
+    #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+    #     vercel-org-id: ${{ secrets.ORG_ID }}
+    #     vercel-project-id: ${{ secrets.PROJECT_ID }}
+    #     vercel-args: '--prod --prebuilt'
 
     - name: Build and push Docker image
       env:
