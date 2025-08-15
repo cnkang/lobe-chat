@@ -39,9 +39,9 @@ phases:
       - echo "OUTPUT_FILE_TRACING_ROOT=$OUTPUT_FILE_TRACING_ROOT"
       - export TOTAL_MB="$(awk '/MemTotal/ {printf "%.0f", $2/1024}' /proc/meminfo)"
       - export HEAP_MB="$(( TOTAL_MB * 60 / 100 ))"
-      - if [ "$HEAP_MB" -lt 4096 ]; then export HEAP_MB=4096; fi
-      - if [ "$HEAP_MB" -gt 6144 ]; then export HEAP_MB=6144; fi
-      - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=128"
+      - if [ "$HEAP_MB" -lt 8192 ]; then export HEAP_MB=8192; fi
+      - if [ "$HEAP_MB" -gt 12288 ]; then export HEAP_MB=12288; fi
+      - export NODE_OPTIONS="--max-old-space-size=${HEAP_MB} --max-semi-space-size=256"
       - export BUN_JOBS="${THREADS}"
       - export SWC_THREADS="${THREADS}"
       - if [ -f bun.lockb ]; then bun install --frozen-lockfile --no-progress; else bun install --no-progress; fi

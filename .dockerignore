@@ -3,6 +3,8 @@ Dockerfile
 node_modules
 npm-debug.log
 .next
+!.next/standalone
+!.next/static
 .git
 .github
 *.md
