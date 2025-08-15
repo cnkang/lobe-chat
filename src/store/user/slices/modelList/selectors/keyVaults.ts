@@ -29,12 +29,6 @@ const isProviderEndpointNotEmpty = (provider: string) => (s: UserStore) => {
 
 const isProviderApiKeyNotEmpty = (provider: string) => (s: UserStore) => {
   const vault = getVaultByProvider(provider as GlobalLLMProviderKey)(s);
-  
-  // Special handling for AWS Bedrock
-  if (provider === 'bedrock') {
-    return !!vault?.accessKeyId || !!vault?.secretAccessKey;
-  }
-  
   return !!vault?.apiKey || !!vault?.bearerToken;
 };
 
