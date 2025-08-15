@@ -190,12 +190,7 @@ const withSentry =
 
 const withPWA =
   isProd && !isDesktop
-    ? withSerwistInit({ 
-        disable: process.env.NODE_ENV !== 'production',
-        register: false, 
-        swDest: 'public/sw.js', 
-        swSrc: 'src/app/sw.ts' 
-      })
+    ? withSerwistInit({ register: false, swDest: 'public/sw.js', swSrc: 'src/app/sw.ts' })
     : noWrapper;
 
 export default withBundleAnalyzer(withPWA(withSentry(nextConfig) as NextConfig));
