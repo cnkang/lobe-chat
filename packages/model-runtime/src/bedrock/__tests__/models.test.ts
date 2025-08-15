@@ -83,9 +83,9 @@ describe('LobeBedrockAI models() method', () => {
 
     const models = await bedrock.models();
     expect(models).toEqual([
-      { id: 'us.anthropic.claude-3-sonnet-20240229-v1:0' },
-      { id: 'us.anthropic.claude-3-haiku-20240307-v1:0' },
-      { id: 'us.meta.llama3-1-70b-instruct-v1:0' },
+      { id: 'us.anthropic.claude-3-sonnet-20240229-v1:0', enabled: true },
+      { id: 'us.anthropic.claude-3-haiku-20240307-v1:0', enabled: true },
+      { id: 'us.meta.llama3-1-70b-instruct-v1:0', enabled: true },
     ]);
   });
 

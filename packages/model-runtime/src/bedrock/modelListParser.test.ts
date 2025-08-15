@@ -88,6 +88,20 @@ describe('parseModelList', () => {
         'claude-v2',
         'claude-v3',
         'titan-embed',
+        'us.amazon.nova-premier-v1:0',
+        'us.amazon.nova-pro-v1:0',
+        'us.amazon.nova-lite-v1:0',
+        'eu.amazon.nova-pro-v1:0',
+        'apac.amazon.nova-lite-v1:0',
+        'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+        'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
+        'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
+        'apac.anthropic.claude-3-5-sonnet-20240620-v1:0',
+        'us.meta.llama3-1-405b-instruct-v1:0',
+        'us.meta.llama3-2-90b-instruct-v1:0',
+        'us.deepseek.r1-v1:0',
+        'us.mistral.pixtral-large-2502-v1:0',
+        'us-gov.anthropic.claude-3-5-sonnet-20240620-v1:0',
       ]);
     });
   });
@@ -102,6 +116,20 @@ describe('parseModelList', () => {
         'claude-v3',
         'titan-text',
         'titan-embed',
+        'us.amazon.nova-premier-v1:0',
+        'us.amazon.nova-pro-v1:0',
+        'us.amazon.nova-lite-v1:0',
+        'eu.amazon.nova-pro-v1:0',
+        'apac.amazon.nova-lite-v1:0',
+        'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+        'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
+        'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
+        'apac.anthropic.claude-3-5-sonnet-20240620-v1:0',
+        'us.meta.llama3-1-405b-instruct-v1:0',
+        'us.meta.llama3-2-90b-instruct-v1:0',
+        'us.deepseek.r1-v1:0',
+        'us.mistral.pixtral-large-2502-v1:0',
+        'us-gov.anthropic.claude-3-5-sonnet-20240620-v1:0',
       ]);
     });
   });

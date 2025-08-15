@@ -22,11 +22,18 @@ export const getProviderAuthPayload = (
 ) => {
   switch (provider) {
     case ModelProvider.Bedrock: {
-      const { bearerToken, region } = keyVaults;
+      const { bearerToken, region, accessKeyId, secretAccessKey, sessionToken } = keyVaults;
 
       return {
-        apiKey: bearerToken,
+        apiKey: secretAccessKey + accessKeyId,
+        awsAccessKeyId: accessKeyId,
         awsRegion: region,
+        awsSecretAccessKey: secretAccessKey,
+        awsSessionToken: sessionToken,
+        accessKeyId: accessKeyId,
+        accessKeySecret: secretAccessKey,
+        region: region,
+        sessionToken: sessionToken,
       };
     }
 
