@@ -2,5 +2,11 @@
   "buildCommand": "echo 'Build completed in CI'",
   "outputDirectory": ".next",
   "installCommand": "echo 'Dependencies installed in CI'",
-  "framework": null
+  "framework": null,
+  "git": {
+    "deploymentEnabled": {
+      "dev-codebuild": true,
+      "main": false
+    }
+  }
 }
