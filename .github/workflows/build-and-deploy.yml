@@ -100,4 +100,6 @@ jobs:
           -f Dockerfile.codebuild \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
           -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          --cache-from type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:cache \
+          --cache-to type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:cache,mode=max \
           --push .
