@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:22-slim AS base
+FROM ghcr.io/library/node:22-slim AS base
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
@@ -15,7 +15,7 @@ RUN apt update \
     && cp /etc/ssl/certs/ca-certificates.crt /distroless/etc/ssl/certs/ca-certificates.crt \
     && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
-FROM public.ecr.aws/docker/library/busybox:latest AS app
+FROM ghcr.io/library/busybox:latest AS app
 
 COPY --from=base /distroless/ /
 

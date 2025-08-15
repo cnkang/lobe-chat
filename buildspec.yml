@@ -48,46 +48,12 @@ phases:
 
   build:
     commands:
-      - set -euxo pipefail
-      - echo "Loading environment variables from SSM"
-      - |
-        REGION="us-east-1"
-        SSM_PREFIX="/newswarrior/lobechat"
-        NEXT_TOKEN=""
-        while :; do
-          if [ -z "${NEXT_TOKEN:-}" ]; then
-            RESP=$(aws ssm get-parameters-by-path --path "${SSM_PREFIX}/" --with-decryption --recursive --region "$REGION" --output json)
-          else
-            RESP=$(aws ssm get-parameters-by-path --path "${SSM_PREFIX}/" --with-decryption --recursive --region "$REGION" --output json --starting-token "$NEXT_TOKEN")
-          fi
-          echo "$RESP" | jq -r '.Parameters[] | "export \(.Name|split("/")[-1])=\(.Value)"' >> /tmp/ssm_env.sh
-          NEXT_TOKEN=$(echo "$RESP" | jq -r '.NextToken // empty')
-          [ -z "$NEXT_TOKEN" ] && break
-        done
-        source /tmp/ssm_env.sh
-      - echo "Running Next.js build (standalone mode)"
-      - export OUTPUT_FILE_TRACING_ROOT=$CODEBUILD_SRC_DIR
-      - bun run prebuild || true
-      - DOCKER=true npx next build
-      - bun run build-sitemap || true
-      - bun run build-migrate-db || true
-      - |
-        if [ ! -f ".next/standalone/server.js" ]; then
-          echo "❌ ERROR: .next/standalone/server.js not found. Check next.config.js has output: 'standalone'" >&2
-          exit 1
-        fi
-      - echo "Building Docker image..."
-      - docker build -f Dockerfile.codebuild -t $IMAGE_REPO_NAME:$IMAGE_TAG . || exit 1
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:latest
+      - echo "Build completed by GitHub Actions. CodeBuild used for deployment artifacts only."
 
   post_build:
     commands:
-      - echo "Pushing Docker image to ECR..."
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - docker push $REPOSITORY_URI:latest
-      - echo "Docker image pushed successfully"
-      - printf '[{"name":"lobe-chat","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo "Creating deployment artifacts..."
+      - printf '[{"name":"lobe-chat","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
 
 artifacts:
   files:
