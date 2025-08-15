@@ -43,13 +43,14 @@ const nextConfig: NextConfig = {
     // OIDC 依赖 constructor.name，避免 SWC 去名
     serverMinification: false,
     webVitalsAttribution: ['CLS', 'LCP'],
-    // Turbopack 配置
-    turbo: {
-      rules: {
-        '*.m?js': {
-          loaders: ['@next/swc-loader'],
-          as: 'javascript/auto',
-        },
+  },
+
+  // Turbopack 配置
+  turbopack: {
+    rules: {
+      '*.m?js': {
+        loaders: ['@next/swc-loader'],
+        as: 'javascript/auto',
       },
     },
   },
