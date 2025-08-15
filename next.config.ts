@@ -115,6 +115,13 @@ const nextConfig: NextConfig = {
   webpack(config) {
     config.experiments = { asyncWebAssembly: true, layers: true };
 
+    // 优化 webpack 缓存性能
+    config.cache = {
+      ...config.cache,
+      compression: 'gzip',
+      maxMemoryGenerations: 1,
+    };
+
     if (enableReactScan && !isUsePglite) {
       config.plugins.push(ReactComponentName({}));
     }
