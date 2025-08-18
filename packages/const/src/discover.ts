@@ -1,10 +1,11 @@
-import { DEFAULT_AGENT_CONFIG } from '@/const/settings';
 import {
   DiscoverAssistantDetail,
   DiscoverModelDetail,
   DiscoverPluginDetail,
   DiscoverProviderDetail,
 } from '@/types/discover';
+
+import { DEFAULT_AGENT_CONFIG } from './settings/agent';
 
 const DEFAULT_CREATED_AT = new Date().toISOString();
 

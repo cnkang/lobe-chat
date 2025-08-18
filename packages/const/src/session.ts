@@ -1,7 +1,8 @@
-import { DEFAULT_AGENT_META, DEFAULT_INBOX_AVATAR } from '@/const/meta';
-import { DEFAULT_AGENT_CONFIG } from '@/const/settings';
 import { LobeAgentSession, LobeSessionType } from '@/types/session';
 import { merge } from '@/utils/merge';
+
+import { DEFAULT_AGENT_META, DEFAULT_INBOX_AVATAR } from './meta';
+import { DEFAULT_AGENT_CONFIG } from './settings/agent';
 
 export const INBOX_SESSION_ID = 'inbox';
 
