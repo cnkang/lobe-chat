@@ -33,13 +33,11 @@ describe('getXorPayload', () => {
     expect(decodedPayload).toEqual(originalPayload);
   });
 
-  it('should correctly decode XOR obfuscated payload with AWS credentials', () => {
+  it('should correctly decode XOR obfuscated payload with AWS Bedrock credentials', () => {
     const originalPayload = {
       userId: 'aws-user-123',
-      awsAccessKeyId: 'AKIAIOSFODNN7EXAMPLE',
-      awsSecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+      apiKey: 'bedrock-bearer-token-example',
       awsRegion: 'us-east-1',
-      awsSessionToken: 'session-token-example',
     };
 
     const obfuscatedToken = obfuscatePayloadWithXOR(originalPayload);

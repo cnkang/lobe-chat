@@ -3,6 +3,7 @@ title: Share Settings via URL - Import and Export Configuration Settings
 description: >-
   Learn how to import and export configuration settings for LobeChat via URL. Understand the supported settings, URL format, and parameter schema for keyVaults and languageModel.
 
+
 tags:
   - Share Settings
   - URL Import
@@ -106,11 +107,10 @@ console.log(url);
 
 - Type `AWSBedrockKeyVault`
 
-| Property name   | Type   | Description                            |
-| --------------- | ------ | -------------------------------------- |
-| accessKeyId     | string | The access key ID for AWS Bedrock.     |
-| region          | string | The region for AWS Bedrock.            |
-| secretAccessKey | string | The secret access key for AWS Bedrock. |
+| Property name | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| bearerToken   | string | The bearer token for AWS Bedrock. |
+| region        | string | The region for AWS Bedrock.       |
 
 ### languageModel
 
@@ -138,9 +138,9 @@ export type UserModelProviderConfig = Record<string, ProviderConfig>;
 
 - Type `ProviderConfig`
 
-| Property name       | Type      | Description                                 |                                |
-| ------------------- | --------- | ------------------------------------------- | ------------------------------ |
-| autoFetchModelLists | boolean   | Whether to automatically fetch model lists. |                                |
-| enabled             | boolean   | Whether the model provider is enabled.      |                                |
-| enabledModels       | string\[] | null                                        | The IDs of the enabled models. |
-| fetchOnClient       | boolean   | Whether to fetch on the client.             |                                |
+| Property name | Type | Description |  |
+| --- | --- | --- | --- |
+| autoFetchModelLists | boolean | Whether to automatically fetch model lists. |  |
+| enabled | boolean | Whether the model provider is enabled. |  |
+| enabledModels | string\[] | null | The IDs of the enabled models. |
+| fetchOnClient | boolean | Whether to fetch on the client. |  |
