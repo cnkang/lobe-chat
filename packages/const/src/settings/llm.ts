@@ -1,17 +1,37 @@
 import { ModelProvider } from '@lobechat/model-runtime';
 
-import { genUserLLMConfig } from '@/utils/genUserLLMConfig';
+// Use a getter to avoid circular dependencies during module initialization
+let _defaultLLMConfig: any = null;
 
-export const DEFAULT_LLM_CONFIG = genUserLLMConfig({
-  lmstudio: {
-    fetchOnClient: true,
+const initLLMConfig = () => {
+  if (!_defaultLLMConfig) {
+    // Lazy load to avoid circular dependencies
+    const { genUserLLMConfig } = require('@/utils/genUserLLMConfig');
+    _defaultLLMConfig = genUserLLMConfig({
+      lmstudio: {
+        fetchOnClient: true,
+      },
+      ollama: {
+        enabled: true,
+        fetchOnClient: true,
+      },
+      openai: {
+        enabled: true,
+      },
+    });
+  }
+  return _defaultLLMConfig;
+};
+
+export const DEFAULT_LLM_CONFIG = new Proxy({} as any, {
+  get(_, prop) {
+    return initLLMConfig()[prop];
   },
-  ollama: {
-    enabled: true,
-    fetchOnClient: true,
+  getOwnPropertyDescriptor(_, prop) {
+    return Object.getOwnPropertyDescriptor(initLLMConfig(), prop);
   },
-  openai: {
-    enabled: true,
+  ownKeys() {
+    return Object.keys(initLLMConfig());
   },
 });
 
