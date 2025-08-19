@@ -79,10 +79,10 @@ describe('getProviderAuthPayload', () => {
   });
 
   it('should return correct payload for Bedrock provider', () => {
-    // 假设的 Bedrock 配置
+    // Bedrock Bearer Token 配置
     const mockBedrockConfig = {
       bearerToken: 'bedrock-bearer-token',
-      region: 'bedrock-region',
+      region: 'us-east-1',
     };
 
     const payload = getProviderAuthPayload(ModelProvider.Bedrock, mockBedrockConfig);

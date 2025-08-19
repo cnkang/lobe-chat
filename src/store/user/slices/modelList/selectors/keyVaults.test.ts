@@ -162,7 +162,7 @@ describe('keyVaultsConfigSelectors', () => {
           settings: {
             keyVaults: {
               bedrock: {
-                bearerToken: 'bearerToken',
+                bearerToken: 'bearer-token',
               } as AWSBedrockKeyVault,
             },
           },

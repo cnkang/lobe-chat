@@ -1,4 +1,4 @@
-import { PRESET_ASPECT_RATIOS } from '@lobechat/const';
+import { PRESET_ASPECT_RATIOS } from '@/const/image';
 import { ModelParamsSchema } from '@/libs/standard-parameters';
 import { AIImageModelCard } from '@/types/aiModel';
 
