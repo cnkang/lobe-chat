@@ -2,8 +2,10 @@ FROM public.ecr.aws/docker/library/node:22-slim AS base
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
-RUN apt update \
-    && apt install ca-certificates proxychains-ng -qy \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        proxychains-ng \
     && mkdir -p /distroless/bin /distroless/etc /distroless/etc/ssl/certs /distroless/lib \
     && cp /usr/lib/$(arch)-linux-gnu/libproxychains.so.4 /distroless/lib/libproxychains.so.4 \
     && cp /usr/lib/$(arch)-linux-gnu/libdl.so.2 /distroless/lib/libdl.so.2 \
@@ -13,7 +15,8 @@ RUN apt update \
     && cp /usr/lib/$(arch)-linux-gnu/libgcc_s.so.1 /distroless/lib/libgcc_s.so.1 \
     && cp /usr/local/bin/node /distroless/bin/node \
     && cp /etc/ssl/certs/ca-certificates.crt /distroless/etc/ssl/certs/ca-certificates.crt \
-    && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 FROM public.ecr.aws/docker/library/busybox:latest AS app
 
@@ -47,6 +50,10 @@ ENV NODE_ENV="production" \
 USER nextjs
 
 EXPOSE 3210/tcp
+
+# Health check - 使用简单的 TCP 连接检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD ["/bin/node", "-e", "require('net').createConnection(3210, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1))"]
 
 ENTRYPOINT ["/bin/node"]
 
