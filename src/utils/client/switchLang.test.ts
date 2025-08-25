@@ -13,6 +13,9 @@ vi.mock('i18next', () => ({
 
 vi.mock('@lobechat/utils', () => ({
   setCookie: vi.fn(),
+  merge: vi.fn((target, source) => ({ ...target, ...source })),
+  withBasePath: vi.fn((path) => path),
+  isDev: false,
 }));
 
 describe('switchLang', () => {

@@ -1,10 +1,11 @@
-import { ModelProvider, ModelRuntime } from '@lobechat/model-runtime';
+import { ModelRuntime } from '@lobechat/model-runtime';
 
-import { checkAuth } from '@/app/(backend)/middleware/auth';
 import { LobeVertexAI } from '@/libs/model-runtime/vertexai';
 import { safeParseJSON } from '@/utils/safeParseJSON';
 
 import { POST as UniverseRoute } from '../[provider]/route';
+
+export const runtime = 'edge';
 
 // due to the Chinese region does not support accessing Google
 // we need to use proxy to access it
@@ -15,9 +16,9 @@ import { POST as UniverseRoute } from '../[provider]/route';
 //   setGlobalDispatcher(new ProxyAgent({ uri: process.env.HTTP_PROXY_URL }));
 // }
 
-export const POST = checkAuth(async (req: Request, { jwtPayload }) =>
+export const POST = async (req: Request) =>
   UniverseRoute(req, {
-    createRuntime: () => {
+    createRuntime: (jwtPayload) => {
       const googleAuthStr = jwtPayload.apiKey ?? process.env.VERTEXAI_CREDENTIALS ?? undefined;
 
       const credentials = safeParseJSON(googleAuthStr);
@@ -31,6 +32,5 @@ export const POST = checkAuth(async (req: Request, { jwtPayload }) =>
 
       return new ModelRuntime(instance);
     },
-    params: Promise.resolve({ provider: ModelProvider.VertexAI }),
-  }),
-);
+    params: Promise.resolve({ provider: 'vertexai' }),
+  });

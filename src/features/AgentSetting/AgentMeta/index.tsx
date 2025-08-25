@@ -68,7 +68,7 @@ const AgentMeta = memo(() => {
           canAutoGenerate={hasSystemRole}
           loading={loadingState?.[item.key]}
           onGenerate={() => {
-            autocompleteMeta(item.key as keyof typeof meta);
+            autocompleteMeta(item.key as any);
           }}
           placeholder={item.placeholder}
         />

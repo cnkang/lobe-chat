@@ -11,7 +11,9 @@ import {
 import { parseDataUri } from './uriParser';
 
 // 模拟依赖
-vi.mock('@lobechat/utils');
+vi.mock('@lobechat/utils', () => ({
+  imageUrlToBase64: vi.fn(),
+}));
 vi.mock('./uriParser');
 
 describe('convertMessageContent', () => {

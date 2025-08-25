@@ -1,4 +1,4 @@
-import { DesktopHotkeyConfig } from '@/types/hotkey';
+import { DesktopHotkeyConfig } from '@lobechat/types';
 
 import { DESKTOP_HOTKEYS_REGISTRATION } from './hotkeys';
 

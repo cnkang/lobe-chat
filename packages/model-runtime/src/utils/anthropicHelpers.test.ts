@@ -19,7 +19,9 @@ vi.mock('./uriParser', () => ({
     type: 'base64',
   }),
 }));
-vi.mock('@lobechat/utils');
+vi.mock('@lobechat/utils', () => ({
+  imageUrlToBase64: vi.fn(),
+}));
 
 describe('anthropicHelpers', () => {
   describe('buildAnthropicBlock', () => {

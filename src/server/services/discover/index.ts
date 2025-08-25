@@ -43,7 +43,11 @@ import {
   ProviderQueryParams,
   ProviderSorts,
 } from '@/types/discover';
-import { getAudioInputUnitRate, getTextInputUnitRate, getTextOutputUnitRate } from '@/utils/pricing';
+import {
+  getAudioInputUnitRate,
+  getTextInputUnitRate,
+  getTextOutputUnitRate,
+} from '@/utils/pricing';
 
 const log = debug('lobe-server:discover');
 
@@ -588,7 +592,7 @@ export class DiscoverService {
 
     raw = merge(cloneDeep(DEFAULT_DISCOVER_PLUGIN_ITEM), raw);
     const list = await this.getPluginList({
-      category: raw.category,
+      category: raw!.category,
       locale,
       page: 1,
       pageSize: 7,
@@ -596,7 +600,7 @@ export class DiscoverService {
 
     let plugin = {
       ...raw,
-      related: list.items.filter((item) => item.identifier !== raw.identifier).slice(0, 6),
+      related: list.items.filter((item) => item.identifier !== raw!.identifier).slice(0, 6),
     };
 
     if (!withManifest || !plugin?.manifest || !isString(plugin?.manifest)) {
@@ -1158,9 +1162,13 @@ export class DiscoverService {
         case ModelSorts.OutputPrice: {
           list = list.sort((a, b) => {
             if (order === 'asc') {
-              return (getTextOutputUnitRate(a.pricing) || 0) - (getTextOutputUnitRate(b.pricing) || 0);
+              return (
+                (getTextOutputUnitRate(a.pricing) || 0) - (getTextOutputUnitRate(b.pricing) || 0)
+              );
             } else {
-              return (getTextOutputUnitRate(b.pricing) || 0) - (getTextOutputUnitRate(a.pricing) || 0);
+              return (
+                (getTextOutputUnitRate(b.pricing) || 0) - (getTextOutputUnitRate(a.pricing) || 0)
+              );
             }
           });
           break;

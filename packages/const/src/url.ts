@@ -1,8 +1,7 @@
+import { withBasePath } from '@lobechat/utils';
+import { isDev } from '@lobechat/utils';
 import qs from 'query-string';
 import urlJoin from 'url-join';
-
-import { withBasePath } from '@/utils/basePath';
-import { isDev } from '@/utils/env';
 
 import { INBOX_SESSION_ID } from './session';
 
