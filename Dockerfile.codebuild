@@ -53,7 +53,7 @@ EXPOSE 3210/tcp
 
 # Health check - 使用简单的 TCP 连接检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["/bin/node", "-e", "require('net').createConnection(3210, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1))"]
+    CMD ["/bin/node", "-e", "require('net').createConnection(3210, '0.0.0.0').on('connect', () => process.exit(0)).on('error', () => process.exit(1))"]
 
 ENTRYPOINT ["/bin/node"]
 

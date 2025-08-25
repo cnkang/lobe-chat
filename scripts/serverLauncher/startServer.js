@@ -100,11 +100,12 @@ ${protocol} ${ip} ${port} ${user} ${pass}
 
 // Function to execute a script with child process spawn
 const runScript = (scriptPath, useProxy = false) => {
+  const env = { ...process.env, HOSTNAME: '0.0.0.0' };
   const command = useProxy
     ? ['/bin/proxychains', '-q', '/bin/node', scriptPath]
     : ['/bin/node', scriptPath];
   return new Promise((resolve, reject) => {
-    const process = spawn(command.shift(), command, { stdio: 'inherit' });
+    const process = spawn(command.shift(), command, { stdio: 'inherit', env });
     process.on('close', (code) =>
       code === 0 ? resolve() : reject(new Error(`🔴 Process exited with code ${code}`)),
     );
