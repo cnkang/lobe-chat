@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { PartialDeep } from 'type-fest';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clientDB, initializeDB } from '@/database/client/db';
 import { userSettings, users } from '@/database/schemas';
@@ -12,7 +12,7 @@ import { ClientService } from './client';
 const mockUser = {
   avatar: 'avatar.png',
   settings: { themeMode: 'light' } as unknown as UserSettings,
-  uuid: 'user-test-id',
+  uuid: 'user-id',
 };
 
 const mockPreference = {
@@ -20,26 +20,20 @@ const mockPreference = {
 } as UserPreference;
 const clientService = new ClientService(mockUser.uuid);
 
+beforeAll(async () => {
+  await initializeDB();
+}, 30000); // Increase timeout for database initialization
+
 beforeEach(async () => {
   vi.clearAllMocks();
 
-  await initializeDB();
-
-  // Clean up existing data
-  await clientDB.delete(userSettings);
   await clientDB.delete(users);
 
   await clientDB.insert(users).values({ id: mockUser.uuid, avatar: 'avatar.png' });
   await clientDB
     .insert(userSettings)
     .values({ id: mockUser.uuid, general: { themeMode: 'light' } });
-}, 30000);
-
-afterEach(async () => {
-  // Clean up test data
-  await clientDB.delete(userSettings);
-  await clientDB.delete(users);
-}, 30000);
+});
 
 describe('ClientService', () => {
   it('should get user state correctly', async () => {

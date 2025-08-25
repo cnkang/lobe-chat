@@ -1,6 +1,6 @@
+import { DEFAULT_ASPECT_RATIO, PRESET_ASPECT_RATIOS } from '@lobechat/const';
 import { useCallback, useMemo } from 'react';
 
-import { DEFAULT_ASPECT_RATIO, PRESET_ASPECT_RATIOS } from '@lobechat/const';
 import { RuntimeImageGenParams, RuntimeImageGenParamsKeys } from '@/libs/standard-parameters/index';
 
 import { useImageStore } from '../../store';
@@ -44,6 +44,14 @@ export function useGenerationConfigParam<
       paramConfig && typeof paramConfig === 'object' && 'enum' in paramConfig
         ? paramConfig.enum
         : undefined;
+    const maxFileSize =
+      paramConfig && typeof paramConfig === 'object' && 'maxFileSize' in paramConfig
+        ? paramConfig.maxFileSize
+        : undefined;
+    const maxCount =
+      paramConfig && typeof paramConfig === 'object' && 'maxCount' in paramConfig
+        ? paramConfig.maxCount
+        : undefined;
 
     return {
       description,
@@ -51,6 +59,8 @@ export function useGenerationConfigParam<
       min,
       step,
       enumValues,
+      maxFileSize,
+      maxCount,
     };
   }, [paramConfig]);
 

@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { clientDB, initializeDB } from '@/database/client/db';
 import { files, globalFiles, users } from '@/database/schemas';
@@ -8,7 +8,7 @@ import { UploadFileParams } from '@/types/files';
 
 import { ClientService } from './client';
 
-const userId = 'file-test-user';
+const userId = 'file-user';
 
 const fileService = new ClientService(userId);
 
@@ -19,24 +19,18 @@ const mockFile = {
   url: '',
 };
 
-beforeEach(async () => {
+beforeAll(async () => {
   await initializeDB();
+}, 30000); // Increase timeout for database initialization
 
-  // Clean up existing data
-  await clientDB.delete(files);
-  await clientDB.delete(globalFiles);
+beforeEach(async () => {
   await clientDB.delete(users);
-
-  // Create test data
-  await clientDB.insert(users).values({ id: userId });
-}, 30000);
-
-afterEach(async () => {
-  // Clean up test data
-  await clientDB.delete(files);
   await clientDB.delete(globalFiles);
-  await clientDB.delete(users);
-}, 30000);
+  // 创建测试数据
+  await clientDB.transaction(async (tx) => {
+    await tx.insert(users).values({ id: userId });
+  });
+});
 
 describe('FileService', () => {
   describe('createFile', () => {
